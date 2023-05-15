@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="CreateVacationTypes-tests">
+    <test verbose="2" preserve-order="true" name="E:/JavaProject/RestAssured-Vacation">
+        <classes><class name="api.Tests">
+            <methods>
+                <include name="createNewTypeOfVacation"/>
+                <include name="getVacationCreatedTypeOnID"/>
+                <include name="createNewTypeOfVacationIfValueExist"/>
+                <include name="createNewTypeOfVacationIfDescriptionExist"/>
+                <include name="createNewTypeVacationIfValueIsEmpty"/>
+                <include name="createNewTypeVacationIfValueIsNull"/>
+                <include name="createNewTypeVacationIfDescriptionIsEmpty"/>
+                <include name="createNewTypeVacationIfDescriptionIsNull"/>
+                <include name="createNewTypeVacationIfValue_255_Symbols"/>
+                <include name="createNewTypeVacationIfValue_256_Symbols"/>
+                <include name="createNewTypeVacationIfDescription_1000_Symbols"/>
+                <include name="createNewTypeVacationIfDescription_1001_Symbols"/>
+                <include name="createNewTypeVacationIfValueAndDescriptionIsEmpty"/>
+                <include name="createNewTypeVacationIfValueNumber"/>
+
+                <include name="createNewTypeOfVacationIfSendEmogi"/>
+
+
+                <include name="deleteVacationTypes"/>
+
+            </methods>
+        </class>
+        </classes>
+    </test>
+</suite>
