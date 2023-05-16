@@ -2,7 +2,7 @@ package api.vacation;
 
 import spec.Specifications;
 
-import static api.Tests.token;
+import static api.Tests_PostVacationType.token;
 import static io.restassured.RestAssured.given;
 
 public class VacationTypeSpec extends Specifications {

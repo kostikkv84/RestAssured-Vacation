@@ -1,7 +1,6 @@
 package api;
 
 import BaseClasses.ResponseModules;
-import api.employee.Employee;
 import api.employee.EmployeeList;
 import api.vacation.TypeVacationAdd;
 import api.vacation.TypeVacationAddIfNumber;
@@ -12,30 +11,21 @@ import io.restassured.RestAssured;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
-import io.restassured.response.ResponseBody;
-import org.apache.commons.lang.RandomStringUtils;
-import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import org.w3c.dom.Text;
 import spec.Specifications;
 
-import java.math.MathContext;
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.is;
 
 
-public class Tests extends Specifications {
+public class Tests_PostVacationType extends Specifications {
     public static String token = "";
     public static String tokenUser = "";
 
