@@ -14,6 +14,8 @@ import io.restassured.response.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import spec.Specifications;
@@ -40,7 +42,7 @@ public class Tests_PostVacationType extends Specifications {
      * Получение токена Admin перед выполнением тестов
      * @throws JSONException
      */
-    @BeforeTest
+    @BeforeClass
     public void testOAuthWithAdmin() throws JSONException {
         Response response =
                 (Response) given()
@@ -60,7 +62,7 @@ public class Tests_PostVacationType extends Specifications {
         System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
         token = accessToken;
     }
-    @BeforeTest
+    @BeforeClass
     public void testOAuthWithUser() throws JSONException {
         Response response =
                 (Response) given()
@@ -129,13 +131,14 @@ public class Tests_PostVacationType extends Specifications {
                 .extract().body().as(VacationType.class);
 
         vacationTypeID = response.getId();
+        System.out.println("СОздан новый тип отпуска с ID - " + vacationTypeID);
         Assert.assertEquals(response.getValue(),"TestType");
     }
 
     /**
      * Проверка созданного, на предидущем шаге типа отпуска
      */
-    @Test
+    @Test (dependsOnMethods={"createNewTypeOfVacation"})
     public void getVacationCreatedTypeOnID(){
         installSpecification(requestSpec(URL), specResponseOK200());
         RestAssured.given().header("Authorization", "Bearer "+token)
@@ -149,7 +152,7 @@ public class Tests_PostVacationType extends Specifications {
         }
 
     /**
-     * Проверка схемы VacationType - созданного на предидущем шаге
+     * Проверка схемы VacationType - полученного запросом Get
      */
     @Test
     public void vacationTypeCheckJsonSchema() {
@@ -355,6 +358,19 @@ public class Tests_PostVacationType extends Specifications {
     }
 
     /**
+     * ПОпытка получения удаленного типа отпуска, после удаления
+     */
+    @Test (dependsOnMethods={"createNewTypeVacationIfValue_255_Symbols"})
+    public void checkDeletedTypeID(){
+        // удаление типа отпуска
+        ResponseModules delete = new ResponseModules();
+        delete.deleteVacationType(token, vacationTypeID);
+        // попытка получить удаленный тип отпуска
+        ResponseModules response = new ResponseModules();
+        Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID));
+    }
+
+    /**
      * Создание нового типа отпуска если значение (Description) = 1000 length.
      */
     @Test
@@ -460,6 +476,10 @@ public class Tests_PostVacationType extends Specifications {
         Assert.assertEquals(response.getDescription(),"Ошибка добавления или обновления записи в бд");
     }
 
+
+
+
+
     @Test
     public void sizeParam_1_Test() {
         installSpecification(requestSpec(URL), specResponseOK200());
@@ -501,8 +521,8 @@ public class Tests_PostVacationType extends Specifications {
     /**
      * Удаление лишних типов отпусков после прохождения тестов - Очистка
      */
- //   @AfterTest
-    @Test
+    @AfterClass
+    //@Test
     public void deleteVacationTypes() {
         // вычисляем количество записей
         Integer count = 0;
@@ -545,15 +565,7 @@ public class Tests_PostVacationType extends Specifications {
 
     }
 //---------------------------------------------------------------------------------
-    /**
-     * Проверка получения удаленного типа отпуска, после удаления
-     */
 
-    @Test
-    public void checkDeletedTypeID(){
-        ResponseModules response = new ResponseModules();
-        Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID));
-    }
 
 
 
