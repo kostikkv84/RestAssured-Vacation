@@ -126,7 +126,8 @@
                 <configuration>
                     <testFailureIgnore>false</testFailureIgnore>
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/main/resources/testng.xml</suiteXmlFile>
+                        <suiteXmlFile>src/main/resources/CreateTypeVacation.xml</suiteXmlFile>
+                        <suiteXmlFile>src/main/resources/ChangeVacationType.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
