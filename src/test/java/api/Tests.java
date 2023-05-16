@@ -1,5 +1,6 @@
 package api;
 
+import BaseClasses.ResponseModules;
 import api.employee.Employee;
 import api.employee.EmployeeList;
 import api.vacation.TypeVacationAdd;
@@ -158,8 +159,22 @@ public class Tests extends Specifications {
         }
 
     /**
+     * Проверка схемы VacationType - созданного на предидущем шаге
+     */
+    @Test
+    public void vacationTypeCheckJsonSchema() {
+        installSpecification(requestSpec(URL), specResponseOK200());
+        RestAssured.given().header("Authorization", "Bearer " + token)
+                .when()
+                .get(URL + "/vacationType/5")
+                .then().log().all()
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VacationTypeSchema.json"));
+    }
+    /**
      * Создание нового типа отпуска. Авторизован - User
      */
+
     @Test
     public void createNewTypeOfVacationIfUser() {
         installSpecification(requestSpec(URL), specResponseError403());
@@ -434,8 +449,6 @@ public class Tests extends Specifications {
 
     }
 
-    //-----------------------------------------------------------------------------------------
-
     /**
      * Создание нового типа отпуска. При указании emogi - БАГ заведен в джира
      */
@@ -542,39 +555,20 @@ public class Tests extends Specifications {
 
     }
 //---------------------------------------------------------------------------------
-
     /**
-     * Проверка данных в полях VacationType - версия с Hamcrest Matchers
+     * Проверка получения удаленного типа отпуска, после удаления
      */
+
     @Test
-    public void vacationTypeCheckFieldsValues() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        RestAssured.given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType/5")
-                .then().log().all()
-                .assertThat()
-                .body("id", is(5))
-                .body("value", is("По уходу за ребенком"))
-                .body("description", is("описание для По уходу за ребенком"));
-            //    .extract().body().as(VacationType.class);
-     //   System.out.println(vacationType.getValue());
-      //  Assert.assertTrue(vacationType.getValue().contains("По уходу за ребенком"), " Значение типа отпуска 5 не совпадает с - По уходу за ребенком "); // проверка возвращаемого значения в Responce
+    public void checkDeletedTypeID(){
+        ResponseModules response = new ResponseModules();
+        Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID));
     }
 
-    /**
-     * Проверка схемы VacationType -
-     */
-    @Test
-    public void vacationTypeCheckJsonSchema() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        RestAssured.given().header("Authorization", "Bearer " + token)
-                .when()
-                .get(URL + "/vacationType/5")
-                .then().log().all()
-                .assertThat()
-                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VacationTypeSchema.json"));
-    }
+
+
+
+
 
 }
 

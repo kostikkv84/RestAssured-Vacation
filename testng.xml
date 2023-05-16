@@ -6,6 +6,7 @@
             <methods>
                 <include name="createNewTypeOfVacation"/>
                 <include name="getVacationCreatedTypeOnID"/>
+                <include name="vacationTypeCheckJsonSchema"/>
                 <include name="createNewTypeOfVacationIfValueExist"/>
                 <include name="createNewTypeOfVacationIfDescriptionExist"/>
                 <include name="createNewTypeVacationIfValueIsEmpty"/>
@@ -18,14 +19,14 @@
                 <include name="createNewTypeVacationIfDescription_1001_Symbols"/>
                 <include name="createNewTypeVacationIfValueAndDescriptionIsEmpty"/>
                 <include name="createNewTypeVacationIfValueNumber"/>
-
                 <include name="createNewTypeOfVacationIfSendEmogi"/>
-
-
                 <include name="deleteVacationTypes"/>
+                <include name="checkDeletedTypeID"/>
+
 
             </methods>
         </class>
         </classes>
     </test>
+
 </suite>

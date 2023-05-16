@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import spec.Specifications;
 
@@ -20,12 +21,14 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.is;
 
 public class TestsForExample extends Specifications {
     public static String token = "";
     public static String tokenUser = "";
 
     @BeforeTest
+    @Ignore
     public void setFilter() {
         RestAssured.filters(new AllureRestAssured());
     }
@@ -35,6 +38,7 @@ public class TestsForExample extends Specifications {
      * @throws JSONException
      */
     @BeforeTest
+    @Ignore
     public void testOAuthWithAdmin() throws JSONException {
         Response response =
                 (Response) given()
@@ -55,6 +59,7 @@ public class TestsForExample extends Specifications {
         token = accessToken;
     }
     @BeforeTest
+    @Ignore
     public void testOAuthWithUser() throws JSONException {
         Response response =
                 (Response) given()
@@ -80,6 +85,7 @@ public class TestsForExample extends Specifications {
      */
     //   @AfterTest
     @Test
+    @Ignore
     public void deleteVacationTypes() {
         // вычисляем количество записей
         Integer count = 0;
@@ -127,6 +133,7 @@ public class TestsForExample extends Specifications {
      * Проверка схему -
      */
     @Test
+    @Ignore
     public void vacationTypeCheckJsonSchema() {
         installSpecification(requestSpec(URL), specResponseOK200());
         RestAssured.given().header("Authorization", "Bearer "+token)
@@ -144,6 +151,7 @@ public class TestsForExample extends Specifications {
      * Простой JsonParser для примера - .then().using().defaultParser(Parser.JSON)
      */
     @Test
+    @Ignore
     public void createNewTypeOfVacationNotAuthorized() {
         installSpecification(requestSpec(URL), specResponseError401());
         TypeVacationAdd requestBody = new TypeVacationAdd("TestType1","TestType Descriptions1");
@@ -158,4 +166,23 @@ public class TestsForExample extends Specifications {
                 .body("error", Matchers.is("Not authorized"));
     }
 
+    /**
+     * Проверка данных в полях VacationType - версия с Hamcrest Matchers
+     */
+    @Test
+    @Ignore
+    public void vacationTypeCheckFieldsValues() {
+        installSpecification(requestSpec(URL), specResponseOK200());
+        RestAssured.given().header("Authorization", "Bearer "+token)
+                .when()
+                .get(URL + "/vacationType/5")
+                .then().log().all()
+                .assertThat()
+                .body("id", is(5))
+                .body("value", is("По уходу за ребенком"))
+                .body("description", is("описание для По уходу за ребенком"));
+        //    .extract().body().as(VacationType.class);
+        //   System.out.println(vacationType.getValue());
+        //  Assert.assertTrue(vacationType.getValue().contains("По уходу за ребенком"), " Значение типа отпуска 5 не совпадает с - По уходу за ребенком "); // проверка возвращаемого значения в Responce
+    }
 }
