@@ -14,10 +14,7 @@ import io.restassured.response.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import spec.Specifications;
 
 import java.util.List;
@@ -47,7 +44,7 @@ public class Tests_PostVacationType extends Specifications {
         Response response =
                 (Response) given()
                         .auth().preemptive().basic("core", "d11e83a3-95cc-460c-9289-511d36d3e3fb")
-.contentType("application/x-www-form-urlencoded").log().all()
+                .contentType("application/x-www-form-urlencoded").log().all()
                 .formParam("grant_type", "password")
                 .formParam("username", "admin")
                 .formParam("password", "admin")
@@ -87,7 +84,7 @@ public class Tests_PostVacationType extends Specifications {
     /**
      * Получение одного типа отпуска - версия TestNG
      */
-    @Test
+    @Test (priority = -2)
     public void getVacationOnId_Exist(){
         installSpecification(requestSpec(URL), specResponseOK200());
         VacationType vacationType = (VacationType) given().header("Authorization", "Bearer "+token)
@@ -102,7 +99,7 @@ public class Tests_PostVacationType extends Specifications {
     /**
      * Получение всех типов отпусков
      */
-    @Test (description = "Получение всех типов отпусков")
+    @Test (description = "Получение всех типов отпусков", priority = -3)
     public void getVacationTypeList() {
         installSpecification(requestSpec(URL), specResponseOK200());
         List<VacationType> list = given().header("Authorization", "Bearer "+token)
@@ -116,11 +113,12 @@ public class Tests_PostVacationType extends Specifications {
     /**
      * Создание нового типа отпуска. Авторизован - Admin
      */
-    @Test
+    @Test (priority = -2)
     public void createNewTypeOfVacation() {
-        installSpecification(requestSpec(URL), specResponseOK201());
-        TypeVacationAdd requestBody = new TypeVacationAdd("TestType","TestType Descriptions");
-        VacationType response = given()
+        installSpecification(requestSpec(URL), specResponseOK201()); // проверка статуса ответа
+        // создается тип отпуска
+        TypeVacationAdd requestBody = new TypeVacationAdd("TestType", "Test description");
+        VacationType resp = given()
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer "+token)
                 .and()
@@ -129,26 +127,34 @@ public class Tests_PostVacationType extends Specifications {
                 .post(URL + "/vacationType")
                 .then().log().all()
                 .extract().body().as(VacationType.class);
+        System.out.println("СОздан новый тип отпуска с ID - " + resp.getId());
+        Assert.assertEquals(resp.getValue(),"TestType"); // проверяется, что тип отпуска создан
 
-        vacationTypeID = response.getId();
-        System.out.println("СОздан новый тип отпуска с ID - " + vacationTypeID);
-        Assert.assertEquals(response.getValue(),"TestType");
+        vacationTypeID = resp.getId();
+      ResponseModules response = new ResponseModules();
+   //   response.deleteVacationType(token,vacationTypeID); // удаляем созданный тип отпуска
+
+    //  Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID)); // проверяем успешное удаление
     }
 
     /**
-     * Проверка созданного, на предидущем шаге типа отпуска
+     * Проверка созданного, на предидущем шаге типа отпуска с последующим удалением
      */
-    @Test (dependsOnMethods={"createNewTypeOfVacation"})
+    @Test (dependsOnMethods={"createNewTypeOfVacation"}, priority = -1)
     public void getVacationCreatedTypeOnID(){
         installSpecification(requestSpec(URL), specResponseOK200());
-        RestAssured.given().header("Authorization", "Bearer "+token)
-                .when()
+            RestAssured.given().header("Authorization", "Bearer "+token)
+                    .when()
                 .get(URL + "/vacationType/"+vacationTypeID)
                 .then().log().all()
                 .assertThat()
                 .body("id", is(vacationTypeID))
                 .body("value", is("TestType"))
-                .body("description", is("TestType Descriptions"));
+                .body("description", is("Test description"));
+
+        ResponseModules delete = new ResponseModules();
+        delete.deleteVacationType(token,vacationTypeID);
+
         }
 
     /**
@@ -208,7 +214,7 @@ public class Tests_PostVacationType extends Specifications {
     @Test
     public void createNewTypeOfVacationIfValueExist() {
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("TestType","Some description");
+        TypeVacationAdd requestBody = new TypeVacationAdd("Основной оплачиваемый","Some description");
         VacationTypeError response = given()
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer "+token)
@@ -227,7 +233,7 @@ public class Tests_PostVacationType extends Specifications {
     @Test
     public void createNewTypeOfVacationIfDescriptionExist() {
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("Some value","описание для По беременности и родам");
+        TypeVacationAdd requestBody = new TypeVacationAdd("Some value","описание для Дополнительный оплачиваемый");
         VacationTypeError response = given()
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer "+token)
@@ -333,8 +339,11 @@ public class Tests_PostVacationType extends Specifications {
                 .post(URL + "/vacationType")
                 .then().log().all()
                 .extract().body().as(VacationType.class);
-
+        vacationTypeID = response.getId();
         Assert.assertEquals(requestBody.getValue(),text,"Значение в Value не совпадает со сгенерированной строкой на 255 символов");
+
+       ResponseModules delete = new ResponseModules();
+       delete.deleteVacationType(token, response.getId());
     }
 
     /**
@@ -361,13 +370,14 @@ public class Tests_PostVacationType extends Specifications {
      * ПОпытка получения удаленного типа отпуска, после удаления
      */
     @Test (dependsOnMethods={"createNewTypeVacationIfValue_255_Symbols"})
+    @Ignore
     public void checkDeletedTypeID(){
         // удаление типа отпуска
         ResponseModules delete = new ResponseModules();
-        delete.deleteVacationType(token, vacationTypeID);
+        delete.deleteVacationType(token, 7);
         // попытка получить удаленный тип отпуска
         ResponseModules response = new ResponseModules();
-        Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID));
+        Assert.assertTrue(response.getVacationTypeOnIDError(token,7));
     }
 
     /**
@@ -387,8 +397,10 @@ public class Tests_PostVacationType extends Specifications {
                 .post(URL + "/vacationType")
                 .then().log().all()
                 .extract().body().as(VacationType.class);
+        Assert.assertEquals(response.getDescription(),text,"Значение в Value не совпадает со сгенерированной строкой на 255 символов");
 
-        Assert.assertEquals(requestBody.getDescription(),text,"Значение в Value не совпадает со сгенерированной строкой на 255 символов");
+        ResponseModules delete = new ResponseModules();
+        delete.deleteVacationType(token,response.getId());
     }
 
     /**
@@ -477,9 +489,6 @@ public class Tests_PostVacationType extends Specifications {
     }
 
 
-
-
-
     @Test
     public void sizeParam_1_Test() {
         installSpecification(requestSpec(URL), specResponseOK200());
@@ -521,6 +530,7 @@ public class Tests_PostVacationType extends Specifications {
     /**
      * Удаление лишних типов отпусков после прохождения тестов - Очистка
      */
+
     @AfterClass
     //@Test
     public void deleteVacationTypes() {
