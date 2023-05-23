@@ -1,3 +1,5 @@
+package api;
+
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
 import io.restassured.RestAssured;
