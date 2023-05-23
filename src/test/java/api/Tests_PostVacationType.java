@@ -82,35 +82,6 @@ public class Tests_PostVacationType extends Specifications {
 //---------------------------------------------------------------------------
 
     /**
-     * Получение одного типа отпуска - версия TestNG
-     */
-    @Test (priority = -2)
-    public void getVacationOnId_Exist(){
-        installSpecification(requestSpec(URL), specResponseOK200());
-        VacationType vacationType = (VacationType) given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType/5")
-                .then().log().all()
-                .extract().body().as(VacationType.class);
-        System.out.println(vacationType.getValue());
-        Assert.assertTrue(vacationType.getValue().contains("По уходу за ребенком"), " Значение типа отпуска 5 не совпадает с - По уходу за ребенком "); // проверка возвращаемого значения в Responce
-    }
-
-    /**
-     * Получение всех типов отпусков
-     */
-    @Test (description = "Получение всех типов отпусков", priority = -3)
-    public void getVacationTypeList() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        List<VacationType> list = given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType")
-                .then().log().all()
-                .extract().jsonPath().getList("",VacationType.class);
-        Assert.assertEquals(list.size(),6);
-    }
-
-    /**
      * Создание нового типа отпуска. Авторизован - Admin
      */
     @Test (priority = -2)
@@ -157,19 +128,7 @@ public class Tests_PostVacationType extends Specifications {
 
         }
 
-    /**
-     * Проверка схемы VacationType - полученного запросом Get
-     */
-    @Test
-    public void vacationTypeCheckJsonSchema() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        RestAssured.given().header("Authorization", "Bearer " + token)
-                .when()
-                .get(URL + "/vacationType/5")
-                .then().log().all()
-                .assertThat()
-                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VacationTypeSchema.json"));
-    }
+
     /**
      * Создание нового типа отпуска. Авторизован - User
      */

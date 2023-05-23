@@ -3,6 +3,7 @@ package api;
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
 import io.restassured.RestAssured;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import spec.Specifications;
@@ -16,20 +17,18 @@ import static org.hamcrest.Matchers.is;
 public class Tests_GetVacationTypes extends Specifications {
 
     /**
-     * Получение типа отпуска
+     * Получение одного типа отпуска - версия TestNG
      */
-    @Test
-    public void getVacationTypeOnID(){
+    @Test (priority = -2)
+    public void getVacationOnId_Exist(){
         installSpecification(requestSpec(URL), specResponseOK200());
-        VacationType response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
+        VacationType vacationType = (VacationType) given().header("Authorization", "Bearer "+token)
                 .when()
-                .get(URL + "/vacationType/3")
+                .get(URL + "/vacationType/5")
                 .then().log().all()
                 .extract().body().as(VacationType.class);
-        Assert.assertEquals(response.getValue(),"Без сохранения ЗП");
-
+        System.out.println(vacationType.getValue());
+        Assert.assertTrue(vacationType.getValue().contains("По уходу за ребенком"), " Значение типа отпуска 5 не совпадает с - По уходу за ребенком "); // проверка возвращаемого значения в Responce
     }
 
     /**
@@ -50,19 +49,31 @@ public class Tests_GetVacationTypes extends Specifications {
     }
 
     /**
-     * Получение всех типов отпуска admin
+     * Получение всех типов отпусков
      */
-    @Test
-    public void getAllVacationTypes(){
+    @Test (description = "Получение всех типов отпусков", priority = -3)
+    public void getVacationTypeList() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        List<VacationType> response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
+        List<VacationType> list = given().header("Authorization", "Bearer "+token)
                 .when()
                 .get(URL + "/vacationType")
                 .then().log().all()
                 .extract().jsonPath().getList("",VacationType.class);
-        Assert.assertEquals(response.get(1).getValue(),"Дополнительный оплачиваемый");
+        Assert.assertEquals(list.size(),6);
+    }
+
+    /**
+     * Проверка схемы VacationType - полученного запросом Get
+     */
+    @Test
+    public void vacationTypeCheckJsonSchema() {
+        installSpecification(requestSpec(URL), specResponseOK200());
+        RestAssured.given().header("Authorization", "Bearer " + token)
+                .when()
+                .get(URL + "/vacationType/5")
+                .then().log().all()
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VacationTypeSchema.json"));
     }
 
     /**
