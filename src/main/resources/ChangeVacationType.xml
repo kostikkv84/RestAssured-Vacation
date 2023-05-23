@@ -2,7 +2,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="ChangeVacationTypes-tests">
     <test verbose="2" preserve-order="true" name="E:/JavaProject/RestAssured-Vacation">
-        <classes><class name="api.Tests_PutVacationTypes">
+        <classes><class name="Tests_PutVacationTypes">
             <methods>
                 <include name="createNewTypeOfVacation"/>
                 <include name="checkDeletedTypeID"/>
