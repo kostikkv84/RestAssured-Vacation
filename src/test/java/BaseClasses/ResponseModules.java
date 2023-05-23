@@ -1,17 +1,33 @@
 package BaseClasses;
 
-import api.vacation.TypeVacationAdd;
-import api.vacation.TypeVacationAddIfNumber;
-import api.vacation.VacationType;
-import api.vacation.VacationTypeError;
-import io.restassured.RestAssured;
+import api.employee.EmployeeList;
+import api.vacation_types.TypeVacationAdd;
+import api.vacation_types.VacationType;
+import api.vacation_types.VacationTypeError;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 import spec.Specifications;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
 public class ResponseModules extends Specifications {
+
+    /**
+     * Получение типа отпуска
+     */
+    public String getVacationTypeOnID(String token, String vacationID){
+        installSpecification(requestSpec(URL), specResponseOK200());
+        VacationType response = given()
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .when()
+                .get(URL + "/vacationType/" + vacationID)
+                .then().log().all()
+                .extract().body().as(VacationType.class);
+        String value = response.getValue();
+        return value;
+    }
 
     /**
      * Попытка получения удаленного типа отпуска.
@@ -135,7 +151,22 @@ public class ResponseModules extends Specifications {
         return vacationDescription;
     }
 
+    /**
+     * Получение ID сотрудника.
+     * @return
+     */
+    public Integer getEmployeeID(){
+        installSpecification(requestSpec(URL), specResponseOK200());
+        EmployeeList response = given()
+                .header("Authorization", "Bearer "+token)
+                .param("id",366)
+                .when()
+                .get(URL +"/employee")
+                .then().log().all()
+                .extract().body().as(EmployeeList.class);
 
+        return response.getContent().get(0).getEmployeeId();
+    }
 
 
 }

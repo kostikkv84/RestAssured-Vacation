@@ -1,6 +1,5 @@
-package api.vacation;
+package api.vacation_types;
 
-import groovy.transform.Sealed;
 import lombok.Getter;
 import lombok.Setter;
 

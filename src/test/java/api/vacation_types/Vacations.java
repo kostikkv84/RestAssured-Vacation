@@ -1,4 +1,4 @@
-package api.vacation;
+package api.vacation_types;
 
 public class Vacations {
     private Integer id;

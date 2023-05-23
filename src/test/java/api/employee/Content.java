@@ -1,6 +1,5 @@
 package api.employee;
 
-import api.vacation.Vacations;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +7,7 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class Employee {
+public class Content {
     private Integer employeeId;
     private String name;
     private String surname;
@@ -16,12 +15,12 @@ public class Employee {
     private Integer departmentId;
     private Integer positionId;
     private String email;
-    private ArrayList<Vacations> vacations;
+    private ArrayList<api.employee.Vacations> vacations;
     private String employmentDate;
 
-    public Employee() {super();}
+    public Content() {super();}
 
-    public Employee(Integer employeeId, String name, String surname, String middleName, Integer departmentId, Integer positionId, String email, ArrayList<Vacations> vacations, String employmentDate) {
+    public Content(Integer employeeId, String name, String surname, String middleName, Integer departmentId, Integer positionId, String email, ArrayList<Vacations> vacations, String employmentDate) {
         this.employeeId = employeeId;
         this.name = name;
         this.surname = surname;

@@ -1,7 +1,5 @@
-package api;
-
 import BaseClasses.ResponseModules;
-import api.vacation.*;
+import api.vacation_types.*;
 import io.restassured.RestAssured;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -90,12 +88,46 @@ public static Integer vacationId;
     }
 
     /**
+     * Изменение созданной записи, изменение: value пробел
+     */
+    @Test (dependsOnMethods={"changeValueAndDescription"})
+    public void changeIfValueIsWhitespace(){
+        installSpecification(requestSpec(URL), specResponseError400());
+        TypeVacationAdd requestBody = new TypeVacationAdd(" ", "Новый тип");
+        List<VacationTypeError> resp = given()
+                .header("Authorization", "Bearer "+token)
+                .body(requestBody)
+                .when()
+                .put(URL + "/vacationType/" + vacationId)
+                .then().log().all()
+                .extract().jsonPath().getList("", VacationTypeError.class);
+        Assert.assertEquals(resp.get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
+    }
+
+    /**
      * Изменение созданной записи, изменение: description пустое
      */
     @Test (dependsOnMethods={"changeValueAndDescription"})
     public void changeIfDescriptionIsNull(){
         installSpecification(requestSpec(URL), specResponseError400());
         TypeVacationAdd requestBody = new TypeVacationAdd("Новый тип отпуска", "");
+        List<VacationTypeError> resp = given()
+                .header("Authorization", "Bearer "+token)
+                .body(requestBody)
+                .when()
+                .put(URL + "/vacationType/" + vacationId)
+                .then().log().all()
+                .extract().jsonPath().getList("", VacationTypeError.class);
+        Assert.assertEquals(resp.get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
+    }
+
+    /**
+     * Изменение созданной записи, изменение: description пробел
+     */
+    @Test (dependsOnMethods={"changeValueAndDescription"})
+    public void changeIfDescriptionIsWhitespace(){
+        installSpecification(requestSpec(URL), specResponseError400());
+        TypeVacationAdd requestBody = new TypeVacationAdd("Новый тип отпуска", " ");
         List<VacationTypeError> resp = given()
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
@@ -223,7 +255,26 @@ public static Integer vacationId;
         Assert.assertEquals(resp.getDescription(),"Тип отпуска не найден, id: " + vacationId);
     }
 
+    /**
+     * Изменение нового типа отпуска если Value, Description = Number. БАГ
+     * в требованиях отправляются значения в формате String
+     */
+    @Test (description = "Баг", dependsOnMethods={"changeValueAndDescription"}, priority = 3)
+    public void ChangeTypeVacationIfValueNumber() {
+        installSpecification(requestSpec(URL), specResponseError400());
+        TypeVacationAddIfNumber requestBody = new TypeVacationAddIfNumber(1,1);
+        VacationTypeError response = given()
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .and()
+                .body(requestBody)
+                .when()
+                .put(URL + "/vacationType")
+                .then().log().all()
+                .extract().body().as(VacationTypeError.class);
+        Assert.assertEquals(response.getDescription(),"Ошибка в формате данных - предполагаемая. Ответ требует доработки");
 
+    }
 
     //------------------------------------------------------------------------------------------------
     /**

@@ -1,11 +1,9 @@
-package api;
-
 import BaseClasses.ResponseModules;
 import api.employee.EmployeeList;
-import api.vacation.TypeVacationAdd;
-import api.vacation.TypeVacationAddIfNumber;
-import api.vacation.VacationType;
-import api.vacation.VacationTypeError;
+import api.vacation_types.TypeVacationAdd;
+import api.vacation_types.TypeVacationAddIfNumber;
+import api.vacation_types.VacationType;
+import api.vacation_types.VacationTypeError;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.module.jsv.JsonSchemaValidator;

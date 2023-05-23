@@ -1,7 +1,7 @@
 package api;
 
-import api.vacation.TypeVacationAdd;
-import api.vacation.VacationType;
+import api.vacation_types.TypeVacationAdd;
+import api.vacation_types.VacationType;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.module.jsv.JsonSchemaValidator;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 public class TestsForExample extends Specifications {
@@ -167,7 +167,7 @@ public class TestsForExample extends Specifications {
     }
 
     /**
-     * Проверка данных в полях VacationType - версия с Hamcrest Matchers
+     * Проверка  с Hamcrest Matchers - is
      */
     @Test
     @Ignore
@@ -184,5 +184,20 @@ public class TestsForExample extends Specifications {
         //    .extract().body().as(VacationType.class);
         //   System.out.println(vacationType.getValue());
         //  Assert.assertTrue(vacationType.getValue().contains("По уходу за ребенком"), " Значение типа отпуска 5 не совпадает с - По уходу за ребенком "); // проверка возвращаемого значения в Responce
+    }
+
+    /**
+     * ПРоверка через Hamcrest - containsString
+     */
+    @Test
+    @Ignore
+    public void getAllVacationTypesNotAuth(){
+        installSpecification(requestSpec(URL), specResponseError401());
+        RestAssured.given()
+                .when()
+                .get(URL + "/vacationType")
+                .then().log().all()
+                .assertThat()
+                .body(containsString("Not authorized"));
     }
 }
