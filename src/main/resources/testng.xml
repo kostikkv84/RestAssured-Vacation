@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true" name="E:/JavaProject/RestAssured-Vacation">
+        <classes>
+            <class name="api.Get_Employee_Tests">
+                <methods>
+                    <include name="getAllEmployee"/>
+                    <include name="getEmployeeOnID"/>
+                    <include name="getEmployeeOnIDifNotExist"/>
+                    <include name="getEmployeeIfNotAuthorized"/>
+                    <include name="getEmployeeIfSize0"/>
+                    <include name="getEmployeeIfSize501"/>
+                    <include name="getEmployeeIfSize1"/>
+                    <include name="getEmployeeIfSize500"/>
+                    <include name="getEmployeeIfPageMinusOne"/>
+                    <include name="getEmployeeIfPage0"/>
+                    <include name="getEmployeeDateFrom2023"/>
+                    <include name="getEmployeeVacationsDateOnly2023"/>
+                    <include name="getEmployeeDateFrom2024DateTo2023"/>
+                    <include name="getEmployeeDateFromNumber"/>
+                    <include name="getEmployeeDateFromLetters"/>
+                    <include name="getEmployeeDateFromSpecSimbols"/>
+                    <include name="getEmployeeDateFromEmogi"/>
+                    <include name="getEmployeeDateTo2023"/>
+                    <include name="getEmployeeDateToNumber"/>
+                    <include name="getEmployeeDateToLetters"/>
+                    <include name="getEmployeeDateToSpecSimbols"/>
+                    <include name="getEmployeeDateToEmogi"/>
+                    <include name="getEmployeePositionIdOK"/>
+                    <include name="getEmployeePositionIdUnknown"/>
+                    <include name="getEmployeePositionIdText"/>
+                    <include name="getEmployeeDepartmentId"/>
+                    <include name="getEmployeeDepartmentIdUnknown"/>
+                    <include name="getEmployeeOnFullName"/>
+                    <include name="getEmployeeOnIDMatchers"/>
+                </methods>
+            </class>
+       <!--     <class name="api.TestsForExample">
+                <methods>
+                    <include name="deleteVacationTypes"/>
+                    <include name="vacationTypeCheckJsonSchema"/>
+                    <include name="createNewTypeOfVacationNotAuthorized"/>
+                    <include name="vacationTypeCheckFieldsValues"/>
+                    <include name="getAllVacationTypesNotAuth"/>
+                </methods>
+            </class> -->
+            <class name="api.Tests_DeleteVacationTypes">
+                <methods>
+                    <include name="deleteIfAuth"/>
+                </methods>
+            </class>
+            <class name="api.Tests_GetVacationTypes">
+                <methods>
+                    <include name="getVacationOnId_Exist"/>
+                    <include name="getVacationTypeList"/>
+                    <include name="getDeletedVacationTypeOnID"/>
+                    <include name="vacationTypeCheckJsonSchema"/>
+                    <include name="getAllVacationTypesNotAuth"/>
+                </methods>
+            </class>
+            <class name="api.Tests_PostVacationType">
+                <methods>
+
+                    <include name="createNewTypeOfVacation"/>
+
+                    <include name="createNewTypeOfVacationIfUser"/>
+                    <include name="createNewTypeOfVacationNotAuthorized"/>
+                    <include name="createNewTypeOfVacationIfValueExist"/>
+                    <include name="createNewTypeOfVacationIfDescriptionExist"/>
+                    <include name="createNewTypeVacationIfValueIsEmpty"/>
+                    <include name="createNewTypeVacationIfValueIsNull"/>
+                    <include name="createNewTypeVacationIfDescriptionIsEmpty"/>
+                    <include name="createNewTypeVacationIfDescriptionIsNull"/>
+                    <include name="createNewTypeVacationIfValue_255_Symbols"/>
+                    <include name="createNewTypeVacationIfValue_256_Symbols"/>
+                    <include name="createNewTypeVacationIfDescription_1000_Symbols"/>
+                    <include name="createNewTypeVacationIfDescription_1001_Symbols"/>
+                    <include name="createNewTypeVacationIfValueAndDescriptionIsEmpty"/>
+                    <include name="createNewTypeVacationIfValueNumber"/>
+                    <include name="createNewTypeOfVacationIfSendEmogi"/>
+                    <include name="sizeParam_1_Test"/>
+                    <include name="sizeParam_10_Test"/>
+                </methods>
+            </class>
+            <class name="api.Tests_PutVacationTypes">
+                <methods>
+                    <include name="changeValueAndDescription"/>
+                    <include name="changeValueAndDescriptionIfUser"/>
+                    <include name="changeValueAndDescriptionIfNotAuthorized"/>
+                    <include name="changeIfValueIsNull"/>
+                    <include name="changeIfValueIsWhitespace"/>
+                    <include name="changeIfDescriptionIsNull"/>
+                    <include name="changeIfDescriptionIsWhitespace"/>
+                    <include name="changeValueAndDescriptionInteger"/>
+                    <include name="changeValue255Symbols"/>
+                    <include name="changeDescription1000Symbols"/>
+                    <include name="changeValue256symbols"/>
+                    <include name="changeIfDescription1001Symbols"/>
+                    <include name="changeIfIdUnknown"/>
+                    <include name="changeIfIdWasDeleted"/>
+                    <include name="ChangeTypeVacationIfValueNumber"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
