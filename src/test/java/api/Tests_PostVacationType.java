@@ -25,22 +25,16 @@ import static org.hamcrest.Matchers.is;
 
 
 public class Tests_PostVacationType extends Specifications {
-    public static String token = "";
-    public static String tokenUser = "";
 
     public Integer vacationTypeID = 0;
 
-    @BeforeTest
+  /*  @BeforeTest
     public void setFilter() {
         RestAssured.filters(new AllureRestAssured());
     }
-
-    /**
-     * Получение токена Admin перед выполнением тестов
-     * @throws JSONException
-     */
     @BeforeClass
     public void testOAuthWithAdmin() throws JSONException {
+        installSpecification(requestSpec(URL_TOKEN),specResponseOK200());
         Response response =
                 (Response) given()
                         .auth().preemptive().basic("core", "d11e83a3-95cc-460c-9289-511d36d3e3fb")
@@ -49,9 +43,7 @@ public class Tests_PostVacationType extends Specifications {
                 .formParam("username", "admin")
                 .formParam("password", "admin")
                 .when()
-                .post("http://keycloak-dev.lan/auth/realms/freeipa-realm/protocol/openid-connect/token");
-             /*           .then().log().all();
-        System.out.println(response);*/
+                .post(URL_TOKEN);
 
         JSONObject jsonObject = new JSONObject(response.getBody().asString());
         String accessToken = jsonObject.get("access_token").toString();
@@ -70,15 +62,13 @@ public class Tests_PostVacationType extends Specifications {
                         .formParam("password", "P@ssw0rd4323")
                         .when()
                         .post("http://keycloak-dev.lan/auth/realms/freeipa-realm/protocol/openid-connect/token");
-             /*           .then().log().all();
-        System.out.println(response);*/
 
         JSONObject jsonObject = new JSONObject(response.getBody().asString());
         String accessToken = jsonObject.get("access_token").toString();
         String tokenType = jsonObject.get("token_type").toString();
         System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
         tokenUser = accessToken;
-    }
+    }  */
 //---------------------------------------------------------------------------
 
     /**

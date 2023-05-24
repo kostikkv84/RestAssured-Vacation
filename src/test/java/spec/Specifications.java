@@ -13,6 +13,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 
 import static io.restassured.RestAssured.basic;
@@ -112,8 +113,8 @@ public class Specifications {
      * Получение токена Admin перед выполнением тестов
      * @throws JSONException
      */
-    @BeforeClass
-    public void testOAuthWithAdmin() throws JSONException {
+    @BeforeSuite
+    public void AuthWithAdmin() throws JSONException {
         Response response =
                 (Response) given()
                         .auth().preemptive().basic("core", "d11e83a3-95cc-460c-9289-511d36d3e3fb")
@@ -132,8 +133,8 @@ public class Specifications {
         System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
         token = accessToken;
     }
-    @BeforeClass
-    public void testOAuthWithUser() throws JSONException {
+    @BeforeSuite
+    public void AuthWithUser() throws JSONException {
         Response response =
                 (Response) given()
                         .auth().preemptive().basic("core", "d11e83a3-95cc-460c-9289-511d36d3e3fb")
@@ -149,7 +150,7 @@ public class Specifications {
         JSONObject jsonObject = new JSONObject(response.getBody().asString());
         String accessToken = jsonObject.get("access_token").toString();
         String tokenType = jsonObject.get("token_type").toString();
-        System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
+        System.out.println("Auth Token with type " + tokenType + "   " + accessToken);
         tokenUser = accessToken;
     }
 

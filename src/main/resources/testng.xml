@@ -61,9 +61,7 @@
             </class>
             <class name="api.Tests_PostVacationType">
                 <methods>
-
                     <include name="createNewTypeOfVacation"/>
-
                     <include name="createNewTypeOfVacationIfUser"/>
                     <include name="createNewTypeOfVacationNotAuthorized"/>
                     <include name="createNewTypeOfVacationIfValueExist"/>
