@@ -28,49 +28,6 @@ public class Tests_PostVacationType extends Specifications {
 
     public Integer vacationTypeID = 0;
 
-  /*  @BeforeTest
-    public void setFilter() {
-        RestAssured.filters(new AllureRestAssured());
-    }
-    @BeforeClass
-    public void testOAuthWithAdmin() throws JSONException {
-        installSpecification(requestSpec(URL_TOKEN),specResponseOK200());
-        Response response =
-                (Response) given()
-                        .auth().preemptive().basic("core", "d11e83a3-95cc-460c-9289-511d36d3e3fb")
-                .contentType("application/x-www-form-urlencoded").log().all()
-                .formParam("grant_type", "password")
-                .formParam("username", "admin")
-                .formParam("password", "admin")
-                .when()
-                .post(URL_TOKEN);
-
-        JSONObject jsonObject = new JSONObject(response.getBody().asString());
-        String accessToken = jsonObject.get("access_token").toString();
-        String tokenType = jsonObject.get("token_type").toString();
-        System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
-        token = accessToken;
-    }
-    @BeforeClass
-    public void testOAuthWithUser() throws JSONException {
-        Response response =
-                (Response) given()
-                        .auth().preemptive().basic("core", "d11e83a3-95cc-460c-9289-511d36d3e3fb")
-                        .contentType("application/x-www-form-urlencoded").log().all()
-                        .formParam("grant_type", "password")
-                        .formParam("username", "konstantin.kostylev@irlix.ru")
-                        .formParam("password", "P@ssw0rd4323")
-                        .when()
-                        .post("http://keycloak-dev.lan/auth/realms/freeipa-realm/protocol/openid-connect/token");
-
-        JSONObject jsonObject = new JSONObject(response.getBody().asString());
-        String accessToken = jsonObject.get("access_token").toString();
-        String tokenType = jsonObject.get("token_type").toString();
-        System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
-        tokenUser = accessToken;
-    }  */
-//---------------------------------------------------------------------------
-
     /**
      * Создание нового типа отпуска. Авторизован - Admin
      */

@@ -27,7 +27,7 @@ public class TestsForExample extends Specifications {
     public static String token = "";
     public static String tokenUser = "";
 
-    @BeforeTest
+ //   @BeforeTest
     @Ignore
     public void setFilter() {
         RestAssured.filters(new AllureRestAssured());
@@ -37,7 +37,7 @@ public class TestsForExample extends Specifications {
      * Получение токена Admin перед выполнением тестов
      * @throws JSONException
      */
-    @BeforeTest
+  //  @BeforeTest
     @Ignore
     public void testOAuthWithAdmin() throws JSONException {
         Response response =
@@ -58,7 +58,7 @@ public class TestsForExample extends Specifications {
         System.out.println("Oauth Token with type " + tokenType + "   " + accessToken);
         token = accessToken;
     }
-    @BeforeTest
+ //   @BeforeTest
     @Ignore
     public void testOAuthWithUser() throws JSONException {
         Response response =
@@ -84,8 +84,7 @@ public class TestsForExample extends Specifications {
      * Удаление лишних типов отпусков после прохождения тестов - Очистка
      */
     //   @AfterTest
-    @Test
-    @Ignore
+  //  @Test
     public void deleteVacationTypes() {
         // вычисляем количество записей
         Integer count = 0;
@@ -132,8 +131,7 @@ public class TestsForExample extends Specifications {
     /**
      * Проверка схему -
      */
-    @Test
-    @Ignore
+ //   @Test
     public void vacationTypeCheckJsonSchema() {
         installSpecification(requestSpec(URL), specResponseOK200());
         RestAssured.given().header("Authorization", "Bearer "+token)
@@ -150,8 +148,7 @@ public class TestsForExample extends Specifications {
     /**
      * Простой JsonParser для примера - .then().using().defaultParser(Parser.JSON)
      */
-    @Test
-    @Ignore
+  //  @Test
     public void createNewTypeOfVacationNotAuthorized() {
         installSpecification(requestSpec(URL), specResponseError401());
         TypeVacationAdd requestBody = new TypeVacationAdd("TestType1","TestType Descriptions1");
@@ -169,8 +166,7 @@ public class TestsForExample extends Specifications {
     /**
      * Проверка  с Hamcrest Matchers - is
      */
-    @Test
-    @Ignore
+  //  @Test
     public void vacationTypeCheckFieldsValues() {
         installSpecification(requestSpec(URL), specResponseOK200());
         RestAssured.given().header("Authorization", "Bearer "+token)
@@ -189,8 +185,7 @@ public class TestsForExample extends Specifications {
     /**
      * ПРоверка через Hamcrest - containsString
      */
-    @Test
-    @Ignore
+ //   @Test
     public void getAllVacationTypesNotAuth(){
         installSpecification(requestSpec(URL), specResponseError401());
         RestAssured.given()
