@@ -1,1 +1,0 @@
-{"uuid":"9a3e6474-4428-4695-9e59-76e9dae0d032","name":"RestAssured-Vacation","children":["ecbb7eb5-ff4d-49a2-a176-58fb6615f14f"],"befores":[{"name":"setFilter","status":"passed","stage":"finished","description":"","steps":[],"attachments":[],"parameters":[],"start":1683727787620,"stop":1683727791160}],"afters":[],"start":1683727787474,"stop":1683727800216}
