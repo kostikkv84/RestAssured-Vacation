@@ -28,7 +28,6 @@ public class TestsForExample extends Specifications {
     public static String tokenUser = "";
 
  //   @BeforeTest
-    @Ignore
     public void setFilter() {
         RestAssured.filters(new AllureRestAssured());
     }
@@ -38,7 +37,6 @@ public class TestsForExample extends Specifications {
      * @throws JSONException
      */
   //  @BeforeTest
-    @Ignore
     public void testOAuthWithAdmin() throws JSONException {
         Response response =
                 (Response) given()
@@ -59,7 +57,6 @@ public class TestsForExample extends Specifications {
         token = accessToken;
     }
  //   @BeforeTest
-    @Ignore
     public void testOAuthWithUser() throws JSONException {
         Response response =
                 (Response) given()
