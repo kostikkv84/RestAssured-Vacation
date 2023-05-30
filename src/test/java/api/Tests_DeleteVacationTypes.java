@@ -69,11 +69,11 @@ private Integer typeId;
         // Проверяем, что проверка на ошибку возвращает Истину
         Assert.assertEquals(error.deleteError(URL, token, typeId).getDescription(), "Тип отпуска не найден, id: " + typeId, "Ответ не содержит ошибку");
     }
+
     //------------------------------------------------------------------------------------------------
     /**
      * Удаление лишних типов отпусков после прохождения тестов - Очистка
      */
-
     @AfterClass
     //@Test
     public void deleteVacationTypes() {

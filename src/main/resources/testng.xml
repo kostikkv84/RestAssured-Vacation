@@ -47,7 +47,9 @@
             <class name="api.Tests_DeleteVacationTypes">
                 <methods>
                     <include name="deleteIfAuth"/>
+                    <include name="deleteIfAuthUser"/>
                     <include name="deleteIfNotAuth"/>
+                    <include name="deleteIfTypeWasDeleted"/>
                 </methods>
             </class>
             <class name="api.Tests_GetVacationTypes">
