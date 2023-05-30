@@ -2,6 +2,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="All Test Suite">
     <test verbose="2" preserve-order="true" name="E:/JavaProject/RestAssured-Vacation">
+        <parameter name = "size" value="2"/>
+        <parameter name = "size" value="10"/>
+        <parameter name = "size" value="5"/>
+        <parameter name = "size" value="20"/>
+        <parameter name = "size" value="7"/>
         <classes>
             <class name="api.Get_Employee_Tests">
                 <methods>
@@ -13,8 +18,10 @@
                     <include name="getEmployeeIfSize501"/>
                     <include name="getEmployeeIfSize1"/>
                     <include name="getEmployeeIfSize500"/>
+                    <include name="sizeParamsTest"/>
                     <include name="getEmployeeIfPageMinusOne"/>
                     <include name="getEmployeeIfPage0"/>
+                    <include name="getEmployeeCheckEmploymentDate"/>
                     <include name="getEmployeeDateFrom2023"/>
                     <include name="getEmployeeVacationsDateOnly2023"/>
                     <include name="getEmployeeDateFrom2024DateTo2023"/>

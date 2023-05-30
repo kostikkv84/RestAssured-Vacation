@@ -1,5 +1,13 @@
 package api.vacation_types;
 
+import groovyjarjarantlr4.v4.runtime.tree.pattern.ParseTreePatternMatcher;
+import lombok.Getter;
+import lombok.Setter;
+
+import static io.restassured.RestAssured.given;
+
+@Getter
+@Setter
 public class Vacations {
     private Integer id;
     private String dateFrom;
@@ -16,4 +24,6 @@ public class Vacations {
         this.vacationType = vacationType;
         this.vacationStatus = vacationStatus;
     }
+
+
 }

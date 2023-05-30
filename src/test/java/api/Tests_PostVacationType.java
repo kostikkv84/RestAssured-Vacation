@@ -2,10 +2,7 @@ package api;
 
 import BaseClasses.ResponseModules;
 import api.employee.EmployeeList;
-import api.vacation_types.TypeVacationAdd;
-import api.vacation_types.TypeVacationAddIfNumber;
-import api.vacation_types.VacationType;
-import api.vacation_types.VacationTypeError;
+import api.vacation_types.*;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.module.jsv.JsonSchemaValidator;
@@ -17,6 +14,7 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 import spec.Specifications;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,32 +25,24 @@ import static org.hamcrest.Matchers.is;
 public class Tests_PostVacationType extends Specifications {
 
     public Integer vacationTypeID = 0;
+    private String value = "";
+    private String description = "";
 
     /**
      * Создание нового типа отпуска. Авторизован - Admin
      */
+
     @Test (priority = -2)
-    public void createNewTypeOfVacation() {
+    public void createNewTypeOfVacation(){
         installSpecification(requestSpec(URL), specResponseOK201()); // проверка статуса ответа
-        // создается тип отпуска
-        TypeVacationAdd requestBody = new TypeVacationAdd("TestType", "Test description");
-        VacationType resp = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().body().as(VacationType.class);
-        System.out.println("СОздан новый тип отпуска с ID - " + resp.getId());
-        Assert.assertEquals(resp.getValue(),"TestType"); // проверяется, что тип отпуска создан
+        VacationType request = new VacationType();
+        VacationType req = request.createVacation(URL,token,"NewType", "New description");
 
-        vacationTypeID = resp.getId();
-      ResponseModules response = new ResponseModules();
-   //   response.deleteVacationType(token,vacationTypeID); // удаляем созданный тип отпуска
-
-    //  Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID)); // проверяем успешное удаление
+            vacationTypeID = req.getId();
+            value = req.getValue();
+            description = req.getDescription();
+        System.out.print("ID - " + vacationTypeID + " value " + value + " description " + description) ;
+        Assert.assertEquals(req.getValue(), "NewType");
     }
 
     /**
@@ -61,25 +51,18 @@ public class Tests_PostVacationType extends Specifications {
     @Test (dependsOnMethods={"createNewTypeOfVacation"}, priority = -1)
     public void getVacationCreatedTypeOnID(){
         installSpecification(requestSpec(URL), specResponseOK200());
-            RestAssured.given().header("Authorization", "Bearer "+token)
-                    .when()
-                .get(URL + "/vacationType/"+vacationTypeID)
-                .then().log().all()
-                .assertThat()
-                .body("id", is(vacationTypeID))
-                .body("value", is("TestType"))
-                .body("description", is("Test description"));
-
+        VacationType response = new VacationType();
+                // Проверка созданного типа отпуска
+        Assert.assertTrue(response.getCreatedVacationSuccess(URL, token, vacationTypeID, value, description));
+                // удаление, очистка от ненужных тестовых данных
         ResponseModules delete = new ResponseModules();
         delete.deleteVacationType(token,vacationTypeID);
-
         }
 
 
     /**
      * Создание нового типа отпуска. Авторизован - User
      */
-
     @Test
     public void createNewTypeOfVacationIfUser() {
         installSpecification(requestSpec(URL), specResponseError403());
@@ -92,140 +75,79 @@ public class Tests_PostVacationType extends Specifications {
                 .when()
                 .post(URL + "/vacationType")
                 .then().log().all();
-    //    System.out.println(vacationTypeID);
-      //  Assert.assertEquals(response.getValue(),"TestType");
     }
 
     /**
      * Создание нового типа отпуска. Не авторизован!
      */
     @Test
-    public void createNewTypeOfVacationNotAuthorized() {
+    public void notAuth()
+    {
         installSpecification(requestSpec(URL), specResponseError401());
-        TypeVacationAdd requestBody = new TypeVacationAdd("TestType1","TestType Descriptions1");
-        RestAssured.given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().using().defaultParser(Parser.JSON).log().all()
-                .assertThat()
-                .body("error", is("Not authorized"));
+        VacationTypeNotAuthorized error = new VacationTypeNotAuthorized();
+        // Проверяем, что проверка на ошибку возвращает Истину
+        Assert.assertTrue(error.notAuthError(URL, token, "value", "descroption"), "Ответ не содержит ошибку");
     }
 
     /**
      * Создание нового типа отпуска если значение (Value) отпуска уже существует.
+     * Value - уникально.
      */
     @Test
     public void createNewTypeOfVacationIfValueExist() {
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("Основной оплачиваемый","Some description");
-        VacationTypeError response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().body().as(VacationTypeError.class);
-        Assert.assertEquals(response.getDescription(),"Ошибка добавления или обновления записи в бд");
+        VacationTypeError error = new VacationTypeError();
+        Assert.assertEquals(error.errorCreateVacationAdd(URL,token, "Основной оплачиваемый", "Some descr").getDescription(),"Ошибка добавления или обновления записи в бд");
     }
 
     /**
-     * Создание нового типа отпуска если значение (Description) отпуска уже существует.
+     * Создание нового типа отпуска если значение (Description) отпуска уже существует - УСПЕХ - ошибки быть не должно.
      */
     @Test
     public void createNewTypeOfVacationIfDescriptionExist() {
-        installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("Some value","описание для Дополнительный оплачиваемый");
-        VacationTypeError response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().body().as(VacationTypeError.class);
-        Assert.assertEquals(response.getDescription(),"Ошибка добавления или обновления записи в бд");
+        installSpecification(requestSpec(URL), specResponseOK201());
+        VacationType success  = new VacationType();
+        Assert.assertEquals(success.createVacation(URL,token, "Some value1", "описание для Без сохранения ЗП").getDescription(),"описание для Без сохранения ЗП");
     }
 
     /**
-     * Создание нового типа отпуска если значение (Value) не указано - "".
-     */
-    @Test
-    public void createNewTypeVacationIfValueIsEmpty() {
-        installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("","Unique description of vacation type");
-        List<VacationTypeError> error = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().jsonPath().getList("", VacationTypeError.class);
-        Assert.assertEquals(error.get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
-    }
-
-    /**
-     * Создание нового типа отпуска если значение (Value) = Null (" ").
+     * Создание нового типа отпуска если значение (Value) = null.
      */
     @Test
     public void createNewTypeVacationIfValueIsNull() {
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("","Unique description of vacation type");
-        List<VacationTypeError> error = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().jsonPath().getList("", VacationTypeError.class);
-        Assert.assertEquals(error.get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
+        VacationTypeError error = new VacationTypeError();
+        Assert.assertEquals(error.errorCreateVacationType(URL,token, null, "Some descripton" ).get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
     }
 
     /**
-     * Создание нового типа отпуска если значение (Description) не указано - "".
+     * Создание нового типа отпуска если значение (Value) = Empty (" ").
+     */
+    @Test
+    public void createNewTypeVacationIfValueIsEmpty() {
+        installSpecification(requestSpec(URL), specResponseError400());
+        VacationTypeError error = new VacationTypeError();
+        Assert.assertEquals(error.errorCreateVacationType(URL,token, " ", "Some descripton" ).get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
+    }
+
+    /**
+     * Создание нового типа отпуска если значение (Description) не указано - " ".
      */
     @Test
     public void createNewTypeVacationIfDescriptionIsEmpty() {
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("Unique_value","");
-        List<VacationTypeError> error = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().jsonPath().getList("", VacationTypeError.class);
-        Assert.assertEquals(error.get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
+        VacationTypeError error = new VacationTypeError();
+        Assert.assertEquals(error.errorCreateVacationType(URL,token, "Some value", " " ).get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
     }
 
     /**
-     * Создание нового типа отпуска если значение (Description) = Null (" ").
+     * Создание нового типа отпуска если значение (Description) = Null.
      */
     @Test
     public void createNewTypeVacationIfDescriptionIsNull() {
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("Unique type vacation value","  ");
-        List<VacationTypeError> error = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().jsonPath().getList("", VacationTypeError.class);
-        Assert.assertEquals(error.get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
+        VacationTypeError error = new VacationTypeError();
+        Assert.assertEquals(error.errorCreateVacationType(URL,token, "Some value", null).get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
     }
 
     /**
@@ -235,47 +157,29 @@ public class Tests_PostVacationType extends Specifications {
     public void createNewTypeVacationIfValue_255_Symbols() {
         installSpecification(requestSpec(URL), specResponseOK201());
         String text = RandomString(255);
-        TypeVacationAdd requestBody = new TypeVacationAdd(text,RandomString(10));
-        VacationType response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().body().as(VacationType.class);
-        vacationTypeID = response.getId();
-        Assert.assertEquals(requestBody.getValue(),text,"Значение в Value не совпадает со сгенерированной строкой на 255 символов");
+        VacationType resp = new VacationType();
+        // Проверяем, что создан тип отпуска с Value = 255 символов
+        Assert.assertEquals(resp.createVacation(URL,token, text,RandomString(10)).getValue(), text, "Содержимое value не совпадает.");
 
-       ResponseModules delete = new ResponseModules();
-       delete.deleteVacationType(token, response.getId());
     }
 
     /**
      * Создание нового типа отпуска если значение (Value) = 256 length.
      */
     @Test
-    public void createNewTypeVacationIfValue_256_Symbols() {
+    public void createNewTypeVacationIfValue_256_Symbols(){
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd(RandomString(256),RandomString(10));
-        RestAssured.given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().using().defaultParser(Parser.JSON).log().all()
-                .assertThat()
-                .body("description", is("Ошибка добавления или обновления записи в бд"));
-       // Assert.assertEquals(response.getDescription(), "Ошибка добавления или обновления записи в бд", "Ожидаемое сообщение об ошибке записи в БД не получено .");
+        String text = RandomString(256);
+        VacationTypeError resp = new VacationTypeError();
+        // Проверяем, что создан тип отпуска с Value = 256 символов
+        Assert.assertEquals(resp.errorCreateVacationAdd(URL,token, text,RandomString(10)).getDescription(), "Ошибка добавления или обновления записи в бд", "Содержимое value не совпадает.");
+
     }
 
     /**
      * ПОпытка получения удаленного типа отпуска, после удаления
      */
-    @Test (dependsOnMethods={"createNewTypeVacationIfValue_255_Symbols"})
+    @Test (dependsOnMethods={"getVacationCreatedTypeOnID"})
     @Ignore
     public void checkDeletedTypeID(){
         // удаление типа отпуска
@@ -293,20 +197,9 @@ public class Tests_PostVacationType extends Specifications {
     public void createNewTypeVacationIfDescription_1000_Symbols() {
         installSpecification(requestSpec(URL), specResponseOK201());
         String text = RandomString(1000);
-        TypeVacationAdd requestBody = new TypeVacationAdd(RandomString(10),text);
-        VacationType response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().body().as(VacationType.class);
-        Assert.assertEquals(response.getDescription(),text,"Значение в Value не совпадает со сгенерированной строкой на 255 символов");
-
-        ResponseModules delete = new ResponseModules();
-        delete.deleteVacationType(token,response.getId());
+        VacationType resp = new VacationType();
+        // Проверяем, что создан тип отпуска с Description = 1000 символов
+        Assert.assertEquals(resp.createVacation(URL,token, RandomString(10),text).getDescription(), text, "Содержимое description не совпадает.");
     }
 
     /**
@@ -316,41 +209,23 @@ public class Tests_PostVacationType extends Specifications {
     public void createNewTypeVacationIfDescription_1001_Symbols() {
         installSpecification(requestSpec(URL), specResponseError400());
         String text = RandomString(1001);
-        TypeVacationAdd requestBody = new TypeVacationAdd(RandomString(10),text);
-        RestAssured.given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().using().defaultParser(Parser.JSON).log().all()
-                .assertThat()
-                .body("description", is("Ошибка добавления или обновления записи в бд"));
-        System.out.println("Длинна строки отправленная в Description - " + text.length() + " символов");
-        // Assert.assertEquals(response.getDescription(), "Ошибка добавления или обновления записи в бд", "Ожидаемое сообщение об ошибке записи в БД не получено .");
+        VacationTypeError resp = new VacationTypeError();
+        // Проверяем, что создан тип отпуска с Value = 256 символов
+        Assert.assertEquals(resp.errorCreateVacationAdd(URL,token, RandomString(10),text).getDescription(), "Ошибка добавления или обновления записи в бд", "Содержимое value не совпадает.");
     }
-
 
     /**
      * Создание нового типа отпуска если Value и Description не указаны - пустой Body.
      */
     @Test
     public void createNewTypeVacationIfValueAndDescriptionIsEmpty() {
-        installSpecification(requestSpec(URL), specResponseError400());
-       // TypeVacationAdd requestBody = new TypeVacationAdd("Unique_value","");
-        List<VacationTypeError> error = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body("{}")
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().jsonPath().getList("", VacationTypeError.class);
-        Assert.assertTrue(error.get(0).getDescription().contains("поле не должно быть null и не должно быть пустым"));
-        Assert.assertTrue(error.get(1).getDescription().contains("поле не должно быть null и не должно быть пустым"));
-    }
+       installSpecification(requestSpec(URL), specResponseError400());
+       VacationTypeError errors = new VacationTypeError();
+        // вывод содержимого полей с description
+        errors.errorCreateVacationType(URL,token,null,null).stream().forEach(x -> System.out.println(x.getDescription()));
+        // проверка содержимого полей с description
+        errors.errorCreateVacationType(URL,token,null,null).stream().forEach(x -> Assert.assertTrue(x.getDescription().contains("поле не должно быть null и не должно быть пустым")));
+       }
 
     /**
      * Создание нового типа отпуска если Value, Description = Number. БАГ
@@ -395,42 +270,6 @@ public class Tests_PostVacationType extends Specifications {
     }
 
 
-    @Test
-    public void sizeParam_1_Test() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList employeeData = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .param("size","1")
-                .when()
-                .get(URL+"/employee")
-                .then().log().all()
-                .extract().body().as(EmployeeList.class);
-        System.out.println("Количество отображаемых сотрудников = " + employeeData.getContent().size() + " - PASS");
-        Assert.assertEquals(employeeData.getContent().size(),1);
-    }
-
-    /**
-     * Тест проверяет, что параметр Size выводит заданное количество записей. Что работает.
-     */
-    @Test
-    public void sizeParam_10_Test() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        List<EmployeeList> employeeData = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .param("size","10")
-                .when()
-                .get(URL+"/employee")
-                .then().log().all()
-                .extract().body().path("content");
-        System.out.println("Количество отображаемых записей = " + employeeData.size());
-        System.out.println(tokenUser + " + " + tokenUser);
-        Assert.assertEquals(employeeData.size(),10);
-
-     //   System.out.println("Количество отображаемых сотрудников = " + employeeData.getContent().size() + " - PASS");
-     //   Assert.assertEquals(employeeData.getContent().size(),1);
-    }
 
     //------------------------------------------------------------------------------------------------
     /**

@@ -5,6 +5,7 @@ import api.employee.ErrorParams;
 import io.restassured.RestAssured;
 import org.testng.Assert;
 import org.testng.annotations.Ignore;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import spec.Specifications;
 
@@ -29,15 +30,10 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getAllEmployee() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList response = given()
-                .header("Authorization", "Bearer " + token)
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract().body().as(EmployeeList.class);
-        System.out.println(response.getContent().size());
-        Assert.assertTrue(response.getTotal() > 0);
-        Assert.assertTrue(response.getContent().size() > 1);
+        EmployeeList list = new EmployeeList();
+
+        Assert.assertTrue(list.getEmployeeAll(URL, token).getTotal() > 0);
+        Assert.assertTrue(list.getEmployeeAll(URL, token).getContent().size() > 1);
     }
 
     /**
@@ -46,15 +42,18 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeeOnID() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList response = given()
-                .header("Authorization", "Bearer " + token)
-                .param("id", 366)
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract().body().as(EmployeeList.class);
-        //  System.out.println(response.getContent().get(0).getEmployeeId());
-        Assert.assertEquals(response.getContent().get(0).getEmployeeId(), 366);
+        EmployeeList list = new EmployeeList();
+        Assert.assertEquals(list.getEmployeeList(URL, token, "id", "366").getContent().get(0).getEmployeeId(), 366);
+    }
+
+    /**
+     * Получение данных по сотруднику по ID
+     */
+    @Test
+    public void getEmployeeCheckEmploymentDate(){
+        installSpecification(requestSpec(URL), specResponseOK200());
+        EmployeeList list = new EmployeeList();
+        Assert.assertFalse(list.getEmployeeList(URL, token, "id", "26").getContent().get(0).getEmploymentDate().isEmpty(), "Дата приема на работу у сотрудника пуста");
     }
 
     /**
@@ -132,13 +131,33 @@ public class Get_Employee_Tests extends Specifications {
         installSpecification(requestSpec(URL), specResponseOK200());
         EmployeeList response = given()
                 .header("Authorization", "Bearer " + token)
-                .param("size", 1)
+                .param("size", "1")
                 .when()
                 .get(URL + "/employee")
-                .then().log().all()
+                .then()
+                //.log().all()
                 .extract().body().as(EmployeeList.class);
         // System.out.println(response.get(0).getDescription());
         Assert.assertEquals(response.getContent().size(), 1);
+    }
+
+    /**
+     * Проверка параметризированного теста
+     */
+    @Test
+    @Parameters("size")
+    public void sizeParamsTest(String size) {
+        installSpecification(requestSpec(URL), specResponseOK200());
+        EmployeeList response = given()
+                .header("Authorization", "Bearer " + token)
+                .param("size", size)
+                .when()
+                .get(URL + "/employee")
+                .then()
+                //.log().all()
+                .extract().body().as(EmployeeList.class);
+        System.out.println(response.getContent().size());
+        Assert.assertEquals(response.getContent().size(), size);
     }
 
     /**
@@ -157,6 +176,30 @@ public class Get_Employee_Tests extends Specifications {
         // System.out.println(response.get(0).getDescription());
         Assert.assertTrue(response.getContent().size() > 10);
     }
+
+
+    /**
+     * Тест проверяет, что параметр Size выводит заданное количество записей. Что работает.
+     */
+    @Test
+    public void sizeParam_10_Test() {
+        installSpecification(requestSpec(URL), specResponseOK200());
+        List<EmployeeList> employeeData = given()
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer "+token)
+                .param("size","10")
+                .when()
+                .get(URL+"/employee")
+                .then().log().all()
+                .extract().body().path("content");
+        System.out.println("Количество отображаемых записей = " + employeeData.size());
+        System.out.println(tokenUser + " + " + tokenUser);
+        Assert.assertEquals(employeeData.size(),10);
+
+        //   System.out.println("Количество отображаемых сотрудников = " + employeeData.getContent().size() + " - PASS");
+        //   Assert.assertEquals(employeeData.getContent().size(),1);
+    }
+
 
 //------- Тесты на параметр Page -----------------------------------------
 
@@ -474,18 +517,22 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeePositionIdOK() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList response = RestAssured.given()
+        EmployeeList response = new EmployeeList();
+        EmployeeList resp = response.getEmployeeList(URL, token, "positionId", "1");
+
+                /*RestAssured.given()
                 .header("Authorization", "Bearer " + token)
                 .param("positionId", "1")
                 .when()
                 .get(URL + "/employee")
                 .then().log().all()
                 .extract()
-                .body().as(EmployeeList.class);
-        for (int i = 0; i < response.getContent().size(); i++) { // пробегаемся по всем объектам.
+                .body().as(EmployeeList.class); */
+        resp.getContent().stream().forEach(x -> Assert.assertEquals(x.getPositionId(),1));
+  /*      for (int i = 0; i < response.getContent().size(); i++) { // пробегаемся по всем объектам.
             //        System.out.println(response.getContent().get(i).getPositionId());
             Assert.assertEquals(response.getContent().get(i).getPositionId(), 1, "Id должности отлично от 1");
-        }
+  }*/
     }
 
     /**

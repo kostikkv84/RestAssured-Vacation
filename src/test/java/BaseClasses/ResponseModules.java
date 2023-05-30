@@ -63,6 +63,21 @@ public class ResponseModules extends Specifications {
                 .extract().response();
         System.out.println("Тип отпуска с id: " + idVacationType +  " был удален.");
     }
+    /**
+     * Удаление типа отпуска
+     * NOt AUTH
+     */
+    public void deleteVacationTypeNotAuth(String url, Integer idVacationType){
+        installSpecification(requestSpec(url), specResponseError401());
+        given()
+                .header("Content-type", "application/json")
+                .when()
+                .delete(url+"/vacationType/" + idVacationType)
+                .then()
+                .extract().response();
+        System.out.println("Тип отпуска с id: " + idVacationType +  " был удален.");
+    }
+
 
     /**
      * СОздание нового типа отпуска, возвращает Id из ответа

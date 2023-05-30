@@ -1,5 +1,6 @@
 package api.employee;
 
+import api.vacation_types.Vacations;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +16,7 @@ public class Content {
     private Integer departmentId;
     private Integer positionId;
     private String email;
-    private ArrayList<api.employee.Vacations> vacations;
+    private ArrayList<api.vacation_types.Vacations> vacations;
     private String employmentDate;
 
     public Content() {super();}
