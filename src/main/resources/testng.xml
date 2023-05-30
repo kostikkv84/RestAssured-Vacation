@@ -8,7 +8,7 @@
         <parameter name = "size" value="20"/>
         <parameter name = "size" value="7"/>
         <classes>
-            <class name="api.Get_Employee_Tests">
+            <class name="Get_Employee_Tests">
                 <methods>
                     <include name="sum"/>
                     <include name="getAllEmployee"/>
@@ -44,7 +44,7 @@
                     <include name="getEmployeeOnIDMatchers"/>
                 </methods>
             </class>
-            <class name="api.Tests_DeleteVacationTypes">
+            <class name="Tests_DeleteVacationTypes">
                 <methods>
                     <include name="deleteIfAuth"/>
                     <include name="deleteIfAuthUser"/>
@@ -52,7 +52,7 @@
                     <include name="deleteIfTypeWasDeleted"/>
                 </methods>
             </class>
-            <class name="api.Tests_GetVacationTypes">
+            <class name="Tests_GetVacationTypes">
                 <methods>
                     <include name="getVacationOnId_Exist"/>
                     <include name="getVacationTypeList"/>
@@ -61,7 +61,7 @@
                     <include name="getAllVacationTypesNotAuth"/>
                 </methods>
             </class>
-            <class name="api.Tests_PostVacationType">
+            <class name="Tests_PostVacationType">
                 <methods>
                     <include name="createNewTypeOfVacation"/>
                     <include name="createNewTypeOfVacationIfUser"/>
@@ -83,7 +83,7 @@
                     <include name="sizeParam_10_Test"/>
                 </methods>
             </class>
-            <class name="api.Tests_PutVacationTypes">
+            <class name="Tests_PutVacationTypes">
                 <methods>
                     <include name="changeValueAndDescription"/>
                     <include name="changeValueAndDescriptionIfUser"/>

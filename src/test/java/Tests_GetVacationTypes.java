@@ -1,5 +1,3 @@
-package api;
-
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
 import io.restassured.RestAssured;
@@ -12,7 +10,6 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 
 public class Tests_GetVacationTypes extends Specifications {
 

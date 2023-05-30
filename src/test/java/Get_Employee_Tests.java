@@ -1,5 +1,3 @@
-package api;
-
 import api.employee.EmployeeList;
 import api.employee.ErrorParams;
 import io.restassured.RestAssured;

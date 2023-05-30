@@ -1,7 +1,8 @@
-package api;
-
 import BaseClasses.ResponseModules;
-import api.vacation_types.*;
+import api.vacation_types.TypeVacationAdd;
+import api.vacation_types.TypeVacationAddIfNumber;
+import api.vacation_types.VacationType;
+import api.vacation_types.VacationTypeError;
 import io.restassured.RestAssured;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -13,7 +14,6 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 
 public class Tests_PutVacationTypes extends Specifications {
 

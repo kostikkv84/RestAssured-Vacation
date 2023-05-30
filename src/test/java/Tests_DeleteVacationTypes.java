@@ -1,5 +1,3 @@
-package api;
-
 import BaseClasses.ResponseModules;
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
