@@ -231,7 +231,7 @@ public class Tests_PostVacationType extends Specifications {
      * Создание нового типа отпуска если Value, Description = Number. БАГ
      * в требованиях отправляются значения в формате String
      */
-    @Test (description = "Баг")
+    @Test (description = "Баг - ")
     public void createNewTypeVacationIfValueNumber() {
         installSpecification(requestSpec(URL), specResponseError400());
         TypeVacationAddIfNumber requestBody = new TypeVacationAddIfNumber(1,1);

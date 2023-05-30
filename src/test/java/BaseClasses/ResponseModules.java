@@ -63,6 +63,24 @@ public class ResponseModules extends Specifications {
                 .extract().response();
         System.out.println("Тип отпуска с id: " + idVacationType +  " был удален.");
     }
+
+    /**
+     * Удаление типа отпуска
+     * @param tokenUser
+     * @param idVacationType
+     */
+    public Boolean deleteVacationType403(String url, String tokenUser, Integer idVacationType){
+        installSpecification(requestSpec(url), specResponseError403());
+        given()
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer "+tokenUser)
+                .when()
+                .delete(url+"/vacationType/" + idVacationType)
+                .then()
+                .extract().response();
+        return true;
+    }
+
     /**
      * Удаление типа отпуска
      * NOt AUTH

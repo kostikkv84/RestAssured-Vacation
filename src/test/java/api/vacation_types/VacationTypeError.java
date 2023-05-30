@@ -10,7 +10,7 @@ import static io.restassured.RestAssured.given;
 
 @Getter
 @Setter
-public class VacationTypeError {
+public class VacationTypeError  {
 
     private String id;
     private String description;
@@ -55,4 +55,14 @@ public class VacationTypeError {
         return error;
     }
 
+    public VacationTypeError deleteError(String url, String token, Integer id) {
+        VacationTypeError response = given()
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .delete(url + "/vacationType/" + id)
+                .then()
+                .extract().body().as(VacationTypeError.class);
+        return response;
+    }
 }
