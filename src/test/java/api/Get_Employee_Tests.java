@@ -22,6 +22,11 @@ public class Get_Employee_Tests extends Specifications {
 
     Integer id = 0;
 
+    @Test
+    public void sum(){
+        Assert.assertEquals(5+9,14);
+    }
+
     //--------- Получение сотрудников без параметров ---------------------------
 
     /**
@@ -90,20 +95,13 @@ public class Get_Employee_Tests extends Specifications {
     //------------ Проверка параметра Size ---------------------------------------------
 
     /**
-     * Получение данных по сотрудникам Size = 0
+     * Error. Получение данных по сотрудникам Size = 0
      */
     @Test
     public void getEmployeeIfSize0() {
         installSpecification(requestSpec(URL), specResponseError400());
-        List<ErrorParams> response = given()
-                .header("Authorization", "Bearer " + token)
-                .param("size", 0)
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract().jsonPath().getList("", ErrorParams.class);
-        // System.out.println(response.get(0).getDescription());
-        Assert.assertEquals(response.get(0).getDescription(), "Поле size - Значение должно быть меньше 500 и больше 1");
+        ErrorParams response = new ErrorParams();
+        Assert.assertEquals(response.getError(URL, token, "size", "0").get(0).getDescription(), "Поле size - Значение должно быть меньше 500 и больше 1");
     }
 
     /**
@@ -112,15 +110,8 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeeIfSize501() {
         installSpecification(requestSpec(URL), specResponseError400());
-        List<ErrorParams> response = given()
-                .header("Authorization", "Bearer " + token)
-                .param("size", 501)
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract().jsonPath().getList("", ErrorParams.class);
-        // System.out.println(response.get(0).getDescription());
-        Assert.assertEquals(response.get(0).getDescription(), "Поле size - Значение должно быть меньше 500 и больше 1");
+        ErrorParams response = new ErrorParams();
+        Assert.assertEquals(response.getError(URL, token, "size", "501").get(0).getDescription(), "Поле size - Значение должно быть меньше 500 и больше 1");
     }
 
     /**
@@ -129,16 +120,19 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeeIfSize1() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList response = given()
-                .header("Authorization", "Bearer " + token)
-                .param("size", "1")
-                .when()
-                .get(URL + "/employee")
-                .then()
-                //.log().all()
-                .extract().body().as(EmployeeList.class);
+        EmployeeList response = new EmployeeList();
+        Assert.assertEquals(response.getEmployeeList(URL,token,"size", "1").getContent().size(), 1);
+    }
+
+    /**
+     * Получение данных по сотрудникам Size = 500
+     */
+    @Test
+    public void getEmployeeIfSize500() {
+        installSpecification(requestSpec(URL), specResponseOK200());
+        EmployeeList response = new EmployeeList();
         // System.out.println(response.get(0).getDescription());
-        Assert.assertEquals(response.getContent().size(), 1);
+        Assert.assertTrue(response.getEmployeeList(URL, token, "size", "500").getContent().size() > 10);
     }
 
     /**
@@ -161,44 +155,14 @@ public class Get_Employee_Tests extends Specifications {
     }
 
     /**
-     * Получение данных по сотрудникам Size = 500
-     */
-    @Test
-    public void getEmployeeIfSize500() {
-        installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList response = given()
-                .header("Authorization", "Bearer " + token)
-                .param("size", 500)
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract().body().as(EmployeeList.class);
-        // System.out.println(response.get(0).getDescription());
-        Assert.assertTrue(response.getContent().size() > 10);
-    }
-
-
-    /**
      * Тест проверяет, что параметр Size выводит заданное количество записей. Что работает.
      */
     @Test
     public void sizeParam_10_Test() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        List<EmployeeList> employeeData = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .param("size","10")
-                .when()
-                .get(URL+"/employee")
-                .then().log().all()
-                .extract().body().path("content");
-        System.out.println("Количество отображаемых записей = " + employeeData.size());
-        System.out.println(tokenUser + " + " + tokenUser);
-        Assert.assertEquals(employeeData.size(),10);
-
-        //   System.out.println("Количество отображаемых сотрудников = " + employeeData.getContent().size() + " - PASS");
-        //   Assert.assertEquals(employeeData.getContent().size(),1);
-    }
+        EmployeeList employeeData = new EmployeeList();
+        Assert.assertEquals(employeeData.getEmployeeList(URL,token,"size","10").getContent().size(),10);
+  }
 
 
 //------- Тесты на параметр Page -----------------------------------------
@@ -209,16 +173,8 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeeIfPageMinusOne() {
         installSpecification(requestSpec(URL), specResponseError400());
-        List<ErrorParams> response = given()
-                .header("Authorization", "Bearer " + token)
-                .param("size", 500)
-                .param("page", -1)
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract().jsonPath().getList("", ErrorParams.class);
-        // System.out.println(response.get(0).getDescription());
-        Assert.assertEquals(response.get(0).getDescription(), "Поле page - must be greater than or equal to 0");
+        ErrorParams response = new ErrorParams();
+        Assert.assertEquals(response.getError(URL, token, "page", "-1").get(0).getDescription(), "Поле page - must be greater than or equal to 0");
     }
 
     //------- Тесты на параметр Page -----------------------------------------

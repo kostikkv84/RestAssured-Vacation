@@ -222,7 +222,9 @@ public static Integer vacationId;
      * Изменение записи, если ID не существует
      */
     @Test (dependsOnMethods={"changeValueAndDescription"})
-    public void changeIfIdUnknown(){
+    public void changeIfIdUnknown()
+
+    {
         installSpecification(requestSpec(URL), specResponseError400());
         TypeVacationAdd requestBody = new TypeVacationAdd("Тип", "описание");
         VacationTypeError resp = given()

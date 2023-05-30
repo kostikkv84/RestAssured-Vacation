@@ -10,8 +10,11 @@
         <classes>
             <class name="api.Get_Employee_Tests">
                 <methods>
+
+                    <include name="sum"/>
                     <include name="getAllEmployee"/>
                     <include name="getEmployeeOnID"/>
+                    <include name="getEmployeeCheckEmploymentDate"/>
                     <include name="getEmployeeOnIDifNotExist"/>
                     <include name="getEmployeeIfNotAuthorized"/>
                     <include name="getEmployeeIfSize0"/>
@@ -21,7 +24,6 @@
                     <include name="sizeParamsTest"/>
                     <include name="getEmployeeIfPageMinusOne"/>
                     <include name="getEmployeeIfPage0"/>
-                    <include name="getEmployeeCheckEmploymentDate"/>
                     <include name="getEmployeeDateFrom2023"/>
                     <include name="getEmployeeVacationsDateOnly2023"/>
                     <include name="getEmployeeDateFrom2024DateTo2023"/>
