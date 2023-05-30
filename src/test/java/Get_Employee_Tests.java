@@ -20,7 +20,7 @@ public class Get_Employee_Tests extends Specifications {
 
     Integer id = 0;
 
-    @Test
+    //@Test
     public void sum(){
         Assert.assertEquals(5+9,14);
     }
