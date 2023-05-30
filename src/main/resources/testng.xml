@@ -44,15 +44,6 @@
                     <include name="getEmployeeOnIDMatchers"/>
                 </methods>
             </class>
-       <!--     <class name="api.TestsForExample">
-                <methods>
-                    <include name="deleteVacationTypes"/>
-                    <include name="vacationTypeCheckJsonSchema"/>
-                    <include name="createNewTypeOfVacationNotAuthorized"/>
-                    <include name="vacationTypeCheckFieldsValues"/>
-                    <include name="getAllVacationTypesNotAuth"/>
-                </methods>
-            </class> -->
             <class name="api.Tests_DeleteVacationTypes">
                 <methods>
                     <include name="deleteIfAuth"/>
