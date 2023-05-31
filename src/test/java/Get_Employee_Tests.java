@@ -20,12 +20,11 @@ public class Get_Employee_Tests extends Specifications {
 
     Integer id = 0;
 
+    /**
+     * Просто тест для проверки работы системы тестов.
+     */
     @Test
     public void sum(){
-        Assert.assertEquals(5+9,14);
-    }
-    @Test
-    public void summa(){
         Assert.assertEquals(5+9,14);
     }
 

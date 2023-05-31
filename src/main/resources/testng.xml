@@ -10,8 +10,6 @@
         <classes>
             <class name="Get_Employee_Tests">
                 <methods>
-                   <include name="sum"/>
-                   <include name="summa"/>
                     <include name="getAllEmployee"/>
                     <include name="getEmployeeOnID"/>
                     <include name="getEmployeeCheckEmploymentDate"/>
