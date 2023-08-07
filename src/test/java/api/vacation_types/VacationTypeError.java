@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static spec.Specifications.vacationTypeApi;
 
 @Getter
 @Setter
@@ -25,7 +26,7 @@ public class VacationTypeError  {
         this.timestamp = timestamp;
     }
 
-    public List<VacationTypeError> errorCreateVacationType(String url, String token, String typeValue, String typeDescription){
+    public static List<VacationTypeError> errorCreateVacationType(String url, String token, String typeValue, String typeDescription){
         TypeVacationAdd requestBody = new TypeVacationAdd(typeValue,typeDescription);
         List<VacationTypeError> errors = given()
                 .header("Content-type", "application/json")
@@ -33,7 +34,7 @@ public class VacationTypeError  {
                 .and()
                 .body(requestBody)
                 .when()
-                .post(url + "/vacationType")
+                .post(url + vacationTypeApi)
                 .then().log().all()
                 .extract().jsonPath().getList("", VacationTypeError.class);
         //System.out.println(errors.get(0).getDescription());
@@ -48,11 +49,24 @@ public class VacationTypeError  {
                 .and()
                 .body(requestBody)
                 .when()
-                .post(url + "/vacationType")
+                .post(url + vacationTypeApi)
                 .then().log().all()
                 .extract().body().as(VacationTypeError.class);
         System.out.println(error.getDescription());
         return error;
+    }
+
+    public static VacationTypeError errorPutVacationType(String url, String token, Integer typeVacationId, String typeValue, String typeDescription){
+        TypeVacationAdd requestBody = new TypeVacationAdd(typeValue,typeDescription);
+
+        VacationTypeError resp = given()
+                .header("Authorization", "Bearer "+token)
+                .body(requestBody)
+                .when()
+                .put(url + vacationTypeApi + typeVacationId)
+                .then().log().all()
+                .extract().body().as(VacationTypeError.class);
+        return resp;
     }
 
     public VacationTypeError deleteError(String url, String token, Integer id) {
@@ -60,7 +74,7 @@ public class VacationTypeError  {
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .when()
-                .delete(url + "/vacationType/" + id)
+                .delete(url + vacationTypeApi + id)
                 .then()
                 .extract().body().as(VacationTypeError.class);
         return response;

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
+import static spec.Specifications.vacationTypeApi;
 
 @Getter
 @Setter
@@ -28,7 +29,7 @@ public class VacationTypeNotAuthorized {
                 .and()
                 .body(requestBody)
                 .when()
-                .post(url + "/vacationType")
+                .post(url + vacationTypeApi)
                 .then().using().defaultParser(Parser.JSON).log().all()
                 .assertThat()
                 .body("error", is("Not authorized"));

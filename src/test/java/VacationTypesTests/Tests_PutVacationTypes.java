@@ -1,3 +1,5 @@
+package VacationTypesTests;
+
 import BaseClasses.ResponseModules;
 import api.vacation_types.TypeVacationAdd;
 import api.vacation_types.TypeVacationAddIfNumber;
@@ -6,35 +8,31 @@ import api.vacation_types.VacationTypeError;
 import io.restassured.RestAssured;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import spec.Specifications;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 
 public class Tests_PutVacationTypes extends Specifications {
 
-public static Integer vacationId;
+public static Integer typeVacationId;
 
     /**
      * Изменение записи, авторизован админ
      */
-    @Test (priority = -1)
+    @Test
     public void changeValueAndDescription(){
-    // создание записи для теста
-    ResponseModules response = new ResponseModules();
-    vacationId = response.createNewVacationType(token,"TypeValueForChange","TypeDiscriptionForChange");
-
     installSpecification(requestSpec(URL), specResponseOK200());
     TypeVacationAdd requestBody = new TypeVacationAdd("New value", "New description");
     VacationType resp = given()
             .header("Authorization", "Bearer "+token)
             .body(requestBody)
             .when()
-            .put(URL + "/vacationType/" + vacationId)
+            .put(URL + vacationTypeApi + typeVacationId)
             .then().log().all()
             .extract().body().as(VacationType.class);
 
@@ -53,7 +51,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+tokenUser)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all();
     }
 
@@ -67,7 +65,7 @@ public static Integer vacationId;
         RestAssured.given()
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all()
                 .assertThat().body(containsString("Not authorized"));
     }
@@ -83,7 +81,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all()
                 .extract().jsonPath().getList("", VacationTypeError.class);
         Assert.assertEquals(resp.get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
@@ -100,7 +98,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all()
                 .extract().jsonPath().getList("", VacationTypeError.class);
         Assert.assertEquals(resp.get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
@@ -117,7 +115,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all()
                 .extract().jsonPath().getList("", VacationTypeError.class);
         Assert.assertEquals(resp.get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
@@ -134,7 +132,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all()
                 .extract().jsonPath().getList("", VacationTypeError.class);
         Assert.assertEquals(resp.get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
@@ -151,7 +149,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + vacationTypeApi + typeVacationId)
                 .then().log().all()
                 .extract().body().as(VacationType.class);
         Assert.assertEquals(resp.getValue(),"1000");
@@ -166,7 +164,7 @@ public static Integer vacationId;
         installSpecification(requestSpec(URL), specResponseOK200());
         ResponseModules resp = new ResponseModules();
         String value = RandomString(255);
-        Assert.assertEquals(resp.ChangeVacationTypeValue(token,value,"description",vacationId),value);
+        Assert.assertEquals(resp.ChangeVacationTypeValue(token,value,"description",typeVacationId),value);
     }
 
     /**
@@ -177,7 +175,7 @@ public static Integer vacationId;
         installSpecification(requestSpec(URL), specResponseOK200());
         ResponseModules resp = new ResponseModules();
         String description = RandomString(1000);
-        Assert.assertEquals(resp.ChangeVacationTypeDescription(token,"value",description,vacationId),description);
+        Assert.assertEquals(resp.ChangeVacationTypeDescription(token,"value",description,typeVacationId),description);
     }
 
     /**
@@ -191,7 +189,7 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + "/vacationType/" + typeVacationId)
                 .then().log().all()
                 .extract().body().as(VacationTypeError.class);
         System.out.println(resp.getDescription()
@@ -205,16 +203,9 @@ public static Integer vacationId;
     @Test (dependsOnMethods={"changeValueAndDescription"})
     public void changeIfDescription1001Symbols(){
         installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAdd requestBody = new TypeVacationAdd("Новый тип", RandomString(1001));
-        VacationTypeError resp = given()
-                .header("Authorization", "Bearer "+token)
-                .body(requestBody)
-                .when()
-                .put(URL + "/vacationType/" + vacationId)
-                .then().log().all()
-                .extract().body().as(VacationTypeError.class);
-        System.out.println(resp.getDescription()
-        );
+        VacationTypeError resp = VacationTypeError.errorPutVacationType(URL, token, typeVacationId, "Новый тип", RandomString(1001));
+
+        System.out.println(resp.getDescription());
         Assert.assertEquals(resp.getDescription(),"Ошибка добавления или обновления записи в бд");
     }
 
@@ -244,7 +235,7 @@ public static Integer vacationId;
     @Test (dependsOnMethods={"changeValueAndDescription"}, priority = 3)
     public void changeIfIdWasDeleted(){
         ResponseModules delete = new ResponseModules();
-        delete.deleteVacationType(token,vacationId);
+        delete.deleteVacationType(URL, token,typeVacationId);
 
         installSpecification(requestSpec(URL), specResponseError404());
         TypeVacationAdd requestBody = new TypeVacationAdd("Новый тип", "описание");
@@ -252,11 +243,11 @@ public static Integer vacationId;
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + vacationId)
+                .put(URL + "/vacationType/" + typeVacationId)
                 .then().log().all()
                 .extract().body().as(VacationTypeError.class);
         System.out.println(resp.getDescription());
-        Assert.assertEquals(resp.getDescription(),"Тип отпуска не найден, id: " + vacationId);
+        Assert.assertEquals(resp.getDescription(),"Тип отпуска не найден, id: " + typeVacationId);
     }
 
     /**
@@ -281,51 +272,21 @@ public static Integer vacationId;
     }
 
     //------------------------------------------------------------------------------------------------
+    @BeforeClass
+    public void createVacationTypeForTest(){
+        // создание записи для теста
+        ResponseModules req = new ResponseModules();
+        typeVacationId = req.createNewVacationType(token,"TypeValueForChange","TypeDiscriptionForChange");
+        System.out.println("Создан тип вакансии с ID: " + typeVacationId);
+    }
+
     /**
      * Удаление лишних типов отпусков после прохождения тестов - Очистка
      */
-
     @AfterClass
-    //@Test
-    public void deleteVacationTypes() {
-        // вычисляем количество записей
-        Integer count = 0;
-        installSpecification(requestSpec(URL), specResponseOK200());
-        List<VacationType> list = given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType")
-                .then()
-                //.then().log().all()
-                .extract().jsonPath().getList("",VacationType.class);
-
-        List<Integer> idTypes = list.stream().map(VacationType::getId).collect(Collectors.toList());
-        System.out.println(idTypes);
-
-        //--- если типов отпусков больше 6 - то удалить лишние
-        if (idTypes.size()>6) {
-            for (int i=6;i<idTypes.size();i++){
-                installSpecification(requestSpec(URL), specResponseOK204());
-                given()
-                        .header("Content-type", "application/json")
-                        .header("Authorization", "Bearer "+token)
-                        .when()
-                        .delete(URL+"/vacationType/" + idTypes.get(i))
-                        .then()
-                        .extract().response();
-            }
-        }
-
-        // проверяем количество записей, что их 6
-        installSpecification(requestSpec(URL), specResponseOK200());
-        List<VacationType> listAfterDelete = given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType")
-                .then()
-                //.then().log().all()
-                .extract().jsonPath().getList("",VacationType.class);
-        List<Integer> idTypesAfterDelete = list.stream().map(VacationType::getId).collect(Collectors.toList());
-        System.out.println("ID отпусков после удаления: " + idTypesAfterDelete);
-        Assert.assertEquals(listAfterDelete.size(),6);
-
+    public void deleteVacationTypeAfterTest(){
+        deleteVacationType(URL, token, typeVacationId);
+        System.out.println("Удалена тестовая запись с типом вакансии, ID: " + typeVacationId);
     }
+
 }

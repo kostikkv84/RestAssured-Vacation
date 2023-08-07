@@ -5,7 +5,6 @@ import api.vacation_types.TypeVacationAdd;
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 import spec.Specifications;
 
 import static io.restassured.RestAssured.given;
@@ -47,22 +46,7 @@ public class ResponseModules extends Specifications {
         return true;
     }
 
-    /**
-     * Удаление типа отпуска
-     * @param token
-     * @param idVacationType
-     */
-    public void deleteVacationType(String token, Integer idVacationType){
-        installSpecification(requestSpec(URL), specResponseOK204());
-        given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .when()
-                .delete(URL+"/vacationType/" + idVacationType)
-                .then()
-                .extract().response();
-        System.out.println("Тип отпуска с id: " + idVacationType +  " был удален.");
-    }
+
 
     /**
      * Удаление типа отпуска
@@ -111,7 +95,7 @@ public class ResponseModules extends Specifications {
                 .and()
                 .body(requestBody)
                 .when()
-                .post(URL + "/vacationType")
+                .post(URL + vacationTypeApi)
                 .then().log().all()
                 .extract().body().as(VacationType.class);
         Integer id = response.getId();
@@ -136,7 +120,7 @@ public class ResponseModules extends Specifications {
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + id)
+                .put(URL + vacationTypeApi + id)
                 .then().log().all()
                 .extract().body().as(VacationType.class);
         Integer vacationID = resp.getId();
@@ -156,7 +140,7 @@ public class ResponseModules extends Specifications {
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + id)
+                .put(URL + vacationTypeApi + id)
                 .then().log().all()
                 .extract().body().as(VacationType.class);
         String vacationValue = resp.getValue();
@@ -176,7 +160,7 @@ public class ResponseModules extends Specifications {
                 .header("Authorization", "Bearer "+token)
                 .body(requestBody)
                 .when()
-                .put(URL + "/vacationType/" + id)
+                .put(URL + vacationTypeApi + id)
                 .then().log().all()
                 .extract().body().as(VacationType.class);
         String vacationDescription = resp.getDescription();

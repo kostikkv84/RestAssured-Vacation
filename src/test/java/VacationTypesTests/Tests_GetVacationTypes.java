@@ -1,8 +1,11 @@
+package VacationTypesTests;
+
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
 import io.restassured.RestAssured;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import spec.Specifications;
 
@@ -21,7 +24,7 @@ public class Tests_GetVacationTypes extends Specifications {
         installSpecification(requestSpec(URL), specResponseOK200());
         VacationType vacationType = (VacationType) given().header("Authorization", "Bearer "+token)
                 .when()
-                .get(URL + "/vacationType/5")
+                .get(URL + vacationTypeApi + 5)
                 .then().log().all()
                 .extract().body().as(VacationType.class);
         System.out.println(vacationType.getValue());
@@ -38,7 +41,7 @@ public class Tests_GetVacationTypes extends Specifications {
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer "+token)
                 .when()
-                .get(URL + "/vacationType/146")
+                .get(URL + vacationTypeApi + 146)
                 .then().log().all()
                 .extract().body().as(VacationTypeError.class);
         Assert.assertEquals(response.getDescription(),"Тип отпуска не найден, id: 146");
@@ -53,7 +56,7 @@ public class Tests_GetVacationTypes extends Specifications {
         installSpecification(requestSpec(URL), specResponseOK200());
         List<VacationType> list = given().header("Authorization", "Bearer "+token)
                 .when()
-                .get(URL + "/vacationType")
+                .get(URL + vacationTypeApi)
                 .then().log().all()
                 .extract().jsonPath().getList("",VacationType.class);
         Assert.assertEquals(list.size(),6);
@@ -67,7 +70,7 @@ public class Tests_GetVacationTypes extends Specifications {
         installSpecification(requestSpec(URL), specResponseOK200());
         RestAssured.given().header("Authorization", "Bearer " + token)
                 .when()
-                .get(URL + "/vacationType/5")
+                .get(URL + vacationTypeApi + 5)
                 .then().log().all()
                 .assertThat()
                 .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VacationTypeSchema.json"));
@@ -81,10 +84,17 @@ public class Tests_GetVacationTypes extends Specifications {
         installSpecification(requestSpec(URL), specResponseError401());
         RestAssured.given()
                 .when()
-                .get(URL + "/vacationType")
+                .get(URL + vacationTypeApi)
                 .then().log().all()
                 .assertThat()
                 .body(containsString("Not authorized"));
+    }
+
+    //---------------- Запуск удаления лишних типов вакансий на всякий случай
+
+    @AfterClass
+    public void cleanExtraVacationTypes() {
+        deleteVacationTypes(URL);
     }
 
 }

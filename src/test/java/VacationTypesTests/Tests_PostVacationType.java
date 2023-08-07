@@ -1,3 +1,5 @@
+package VacationTypesTests;
+
 import BaseClasses.ResponseModules;
 import api.vacation_types.*;
 import io.restassured.RestAssured;
@@ -7,14 +9,14 @@ import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import spec.Specifications;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 
 
 public class Tests_PostVacationType extends Specifications {
-
+    List listToDelete = new ArrayList();
     public Integer vacationTypeID = 0;
     private String value = "";
     private String description = "";
@@ -26,14 +28,17 @@ public class Tests_PostVacationType extends Specifications {
     @Test (priority = -2)
     public void createNewTypeOfVacation(){
         installSpecification(requestSpec(URL), specResponseOK201()); // проверка статуса ответа
-        VacationType request = new VacationType();
-        VacationType req = request.createVacation(URL,token,"NewType", "New description");
+        VacationType response = VacationType.createVacationStr(URL,token,"NewType", "New description");
 
-            vacationTypeID = req.getId();
-            value = req.getValue();
-            description = req.getDescription();
-        System.out.print("ID - " + vacationTypeID + " value " + value + " description " + description) ;
-        Assert.assertEquals(req.getValue(), "NewType");
+        vacationTypeID = response.getId();
+        value = response.getValue();
+        description = response.getDescription();
+
+        listToDelete.add(response.getId());
+        System.out.println(value);
+        System.out.println(listToDelete);
+        Assert.assertEquals(response.getValue(), "NewType");
+
     }
 
     /**
@@ -46,8 +51,8 @@ public class Tests_PostVacationType extends Specifications {
                 // Проверка созданного типа отпуска
         Assert.assertTrue(response.getCreatedVacationSuccess(URL, token, vacationTypeID, value, description));
                 // удаление, очистка от ненужных тестовых данных
-        ResponseModules delete = new ResponseModules();
-        delete.deleteVacationType(token,vacationTypeID);
+
+     //   deleteVacationType(URL, token,vacationTypeID);
         }
 
 
@@ -64,7 +69,7 @@ public class Tests_PostVacationType extends Specifications {
                 .and()
                 .body(requestBody)
                 .when()
-                .post(URL + "/vacationType")
+                .post(URL + vacationTypeApi)
                 .then().log().all();
     }
 
@@ -77,7 +82,7 @@ public class Tests_PostVacationType extends Specifications {
         installSpecification(requestSpec(URL), specResponseError401());
         VacationTypeNotAuthorized error = new VacationTypeNotAuthorized();
         // Проверяем, что проверка на ошибку возвращает Истину
-        Assert.assertTrue(error.notAuthError(URL, token, "value", "descroption"), "Ответ не содержит ошибку");
+        Assert.assertTrue(error.notAuthError(URL, token, "value", "description"), "Ответ не содержит ошибку");
     }
 
     /**
@@ -88,7 +93,7 @@ public class Tests_PostVacationType extends Specifications {
     public void createNewTypeOfVacationIfValueExist() {
         installSpecification(requestSpec(URL), specResponseError400());
         VacationTypeError error = new VacationTypeError();
-        Assert.assertEquals(error.errorCreateVacationAdd(URL,token, "Основной оплачиваемый", "Some descr").getDescription(),"Ошибка добавления или обновления записи в бд");
+        Assert.assertEquals(error.errorCreateVacationAdd(URL,token, value, "Some descr").getDescription(),"Ошибка добавления или обновления записи в бд");
     }
 
     /**
@@ -97,8 +102,10 @@ public class Tests_PostVacationType extends Specifications {
     @Test
     public void createNewTypeOfVacationIfDescriptionExist() {
         installSpecification(requestSpec(URL), specResponseOK201());
-        VacationType success  = new VacationType();
-        Assert.assertEquals(success.createVacation(URL,token, "Some value1", "описание для Без сохранения ЗП").getDescription(),"описание для Без сохранения ЗП");
+        VacationType response  = VacationType.createVacationStr(URL,token, "Some value1", "описание для Без сохранения ЗП");
+        listToDelete.add(response.getId());
+        System.out.println(listToDelete);
+        Assert.assertEquals(response.getDescription(),"описание для Без сохранения ЗП");
     }
 
     /**
@@ -122,6 +129,16 @@ public class Tests_PostVacationType extends Specifications {
     }
 
     /**
+     * Создание нового типа отпуска если значение (Value) = Empty (" ").
+     */
+    @Test
+    public void createNewTypeVacationIfValueIsBoolean() {
+        installSpecification(requestSpec(URL), specResponseError400());
+
+        Assert.assertEquals(VacationTypeError.errorCreateVacationType(URL,token, " ", "Some descripton" ).get(0).getDescription(),"Поле value: поле не должно быть null и не должно быть пустым");
+    }
+
+    /**
      * Создание нового типа отпуска если значение (Description) не указано - " ".
      */
     @Test
@@ -130,6 +147,8 @@ public class Tests_PostVacationType extends Specifications {
         VacationTypeError error = new VacationTypeError();
         Assert.assertEquals(error.errorCreateVacationType(URL,token, "Some value", " " ).get(0).getDescription(),"Поле description: поле не должно быть null и не должно быть пустым");
     }
+
+
 
     /**
      * Создание нового типа отпуска если значение (Description) = Null.
@@ -148,9 +167,11 @@ public class Tests_PostVacationType extends Specifications {
     public void createNewTypeVacationIfValue_255_Symbols() {
         installSpecification(requestSpec(URL), specResponseOK201());
         String text = RandomString(255);
-        VacationType resp = new VacationType();
+        VacationType response = VacationType.createVacationStr(URL,token, text,RandomString(10));
         // Проверяем, что создан тип отпуска с Value = 255 символов
-        Assert.assertEquals(resp.createVacation(URL,token, text,RandomString(10)).getValue(), text, "Содержимое value не совпадает.");
+        listToDelete.add(response.getId());
+        System.out.println(listToDelete);
+        Assert.assertEquals(response.getValue(), text, "Содержимое value не совпадает.");
 
     }
 
@@ -168,17 +189,17 @@ public class Tests_PostVacationType extends Specifications {
     }
 
     /**
-     * ПОпытка получения удаленного типа отпуска, после удаления
+     * Попытка получения удаленного типа отпуска, после удаления
      */
     @Test (dependsOnMethods={"getVacationCreatedTypeOnID"})
     @Ignore
     public void checkDeletedTypeID(){
         // удаление типа отпуска
         ResponseModules delete = new ResponseModules();
-        delete.deleteVacationType(token, 7);
+        delete.deleteVacationType(URL, token, vacationTypeID);
         // попытка получить удаленный тип отпуска
         ResponseModules response = new ResponseModules();
-        Assert.assertTrue(response.getVacationTypeOnIDError(token,7));
+        Assert.assertTrue(response.getVacationTypeOnIDError(token,vacationTypeID));
     }
 
     /**
@@ -188,9 +209,12 @@ public class Tests_PostVacationType extends Specifications {
     public void createNewTypeVacationIfDescription_1000_Symbols() {
         installSpecification(requestSpec(URL), specResponseOK201());
         String text = RandomString(1000);
-        VacationType resp = new VacationType();
+        VacationType response = VacationType.createVacationStr(URL,token, RandomString(10),text);
+        // Проверяем, что создан тип отпуска с Value = 255 символов
+        listToDelete.add(response.getId());
+        System.out.println(listToDelete);
         // Проверяем, что создан тип отпуска с Description = 1000 символов
-        Assert.assertEquals(resp.createVacation(URL,token, RandomString(10),text).getDescription(), text, "Содержимое description не совпадает.");
+        Assert.assertEquals(response.getDescription(), text, "Содержимое description не совпадает.");
     }
 
     /**
@@ -219,30 +243,24 @@ public class Tests_PostVacationType extends Specifications {
        }
 
     /**
-     * Создание нового типа отпуска если Value, Description = Number. БАГ
-     * в требованиях отправляются значения в формате String
+     * Создание нового типа отпуска если Value, Description = Number.
      */
-    @Test (description = "Баг - ")
+    @Test
     public void createNewTypeVacationIfValueNumber() {
-        installSpecification(requestSpec(URL), specResponseError400());
-        TypeVacationAddIfNumber requestBody = new TypeVacationAddIfNumber(1,1);
-        VacationTypeError response = given()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer "+token)
-                .and()
-                .body(requestBody)
-                .when()
-                .post(URL + "/vacationType")
-                .then().log().all()
-                .extract().body().as(VacationTypeError.class);
-        Assert.assertEquals(response.getDescription(),"Ошибка в формате данных - предполагаемая. Ответ требует доработки");
+        installSpecification(requestSpec(URL), specResponseOK201());
+        Integer value = randomNumber(4);
+        VacationType response = VacationType.createVacationInt(URL,token, value,randomNumber(3));
 
+        listToDelete.add(response.getId());
+        System.out.println(listToDelete);
+        // Проверяем, что создан тип отпуска с value = число
+        Assert.assertEquals(Integer.parseInt(response.getValue()), value, "Содержимое value не совпадает.");
     }
 
     /**
      * Создание нового типа отпуска. При указании emogi - БАГ заведен в джира
      */
-    @Test
+    @Test (description = "Тест на эмоджи в теле запроса на создание записи")
     public void createNewTypeOfVacationIfSendEmogi() {
         installSpecification(requestSpec(URL), specResponseError400());
         TypeVacationAdd requestBody = new TypeVacationAdd("♣☺♂♣☺♣☺","♣☺♂♣♣☺♂♣♣☺♂♣");
@@ -252,7 +270,7 @@ public class Tests_PostVacationType extends Specifications {
                 .and()
                 .body(requestBody)
                 .when()
-                .post(URL + "/vacationType")
+                .post(URL + vacationTypeApi)
                 .then().log().all()
                 .extract().body().as(VacationTypeError.class);
         System.out.println(response.getDescription());
@@ -268,47 +286,10 @@ public class Tests_PostVacationType extends Specifications {
      */
 
     @AfterClass
-    //@Test
-    public void deleteVacationTypes() {
-        // вычисляем количество записей
-        Integer count = 0;
-        installSpecification(requestSpec(URL), specResponseOK200());
-        List<VacationType> list = given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType")
-                .then()
-                //.then().log().all()
-                .extract().jsonPath().getList("",VacationType.class);
-
-        List<Integer> idTypes = list.stream().map(VacationType::getId).collect(Collectors.toList());
-        System.out.println(idTypes);
-
-        //--- если типов отпусков больше 6 - то удалить лишние
-        if (idTypes.size()>6) {
-            for (int i=6;i<idTypes.size();i++){
-                installSpecification(requestSpec(URL), specResponseOK204());
-                given()
-                        .header("Content-type", "application/json")
-                        .header("Authorization", "Bearer "+token)
-                        .when()
-                        .delete(URL+"/vacationType/" + idTypes.get(i))
-                        .then()
-                        .extract().response();
-            }
-        }
-
-        // проверяем количество записей, что их 6
-        installSpecification(requestSpec(URL), specResponseOK200());
-        List<VacationType> listAfterDelete = given().header("Authorization", "Bearer "+token)
-                .when()
-                .get(URL + "/vacationType")
-                .then()
-                //.then().log().all()
-                .extract().jsonPath().getList("",VacationType.class);
-        List<Integer> idTypesAfterDelete = list.stream().map(VacationType::getId).collect(Collectors.toList());
-        System.out.println("ID отпусков после удаления: " + idTypesAfterDelete);
-        Assert.assertEquals(listAfterDelete.size(),6);
-
+    public void deleteVacationAfterTests(){
+        //deleteVacationTypes(URL);
+        System.out.println(listToDelete);
+        deleteAllExtraVacationTypes(URL, token,listToDelete);
     }
 //---------------------------------------------------------------------------------
 

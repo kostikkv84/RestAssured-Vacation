@@ -476,20 +476,7 @@ public class Get_Employee_Tests extends Specifications {
         installSpecification(requestSpec(URL), specResponseOK200());
         EmployeeList response = new EmployeeList();
         EmployeeList resp = response.getEmployeeList(URL, token, "positionId", "1");
-
-                /*RestAssured.given()
-                .header("Authorization", "Bearer " + token)
-                .param("positionId", "1")
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract()
-                .body().as(EmployeeList.class); */
         resp.getContent().stream().forEach(x -> Assert.assertEquals(x.getPositionId(),1));
-  /*      for (int i = 0; i < response.getContent().size(); i++) { // пробегаемся по всем объектам.
-            //        System.out.println(response.getContent().get(i).getPositionId());
-            Assert.assertEquals(response.getContent().get(i).getPositionId(), 1, "Id должности отлично от 1");
-  }*/
     }
 
     /**
@@ -498,16 +485,9 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeePositionIdUnknown() {
         installSpecification(requestSpec(URL), specResponseOK200());
-        EmployeeList response = RestAssured.given()
-                .header("Authorization", "Bearer " + token)
-                .param("positionId", "145")
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract()
-                .body().as(EmployeeList.class);
+        EmployeeList response = new EmployeeList();
 
-        Assert.assertEquals(response.getTotal(), 0, "Сотрудники с указанным ID должности найдены");
+        Assert.assertEquals(response.getEmployeeList(URL,token, "positionId","45458").getTotal(), 0, "Сотрудники с указанным ID должности найдены");
     }
 
     /**
@@ -516,16 +496,8 @@ public class Get_Employee_Tests extends Specifications {
     @Test
     public void getEmployeePositionIdText() {
         installSpecification(requestSpec(URL), specResponseError400());
-        List<ErrorParams> response = RestAssured.given()
-                .header("Authorization", "Bearer " + token)
-                .param("positionId", "text")
-                .when()
-                .get(URL + "/employee")
-                .then().log().all()
-                .extract()
-                .jsonPath().getList("", ErrorParams.class);
-
-        Assert.assertTrue(response.get(0).getDescription().contains("java.lang.NumberFormatException:"), "Сотрудники с указанным ID должности найдены");
+        ErrorParams response= new ErrorParams();
+        Assert.assertTrue(response.getError(URL,token, "positionId", "text").get(0).getDescription().contains("java.lang.NumberFormatException:"), "Сотрудники с указанным ID должности найдены");
     }
 
     // --------- Тест на параметр DepartmentID --------------

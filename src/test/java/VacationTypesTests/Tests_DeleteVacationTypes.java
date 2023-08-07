@@ -1,3 +1,5 @@
+package VacationTypesTests;
+
 import BaseClasses.ResponseModules;
 import api.vacation_types.VacationType;
 import api.vacation_types.VacationTypeError;
@@ -24,7 +26,7 @@ private Integer typeId;
     ResponseModules response = new ResponseModules();
     typeId = response.createNewVacationType(token, "new value", "new description");
     //удаляем
-    response.deleteVacationType(token, typeId);
+    deleteVacationType(URL, token, typeId);
     // проверяем, что удален
     Assert.assertTrue(response.getVacationTypeOnIDError(token, typeId));
 }
